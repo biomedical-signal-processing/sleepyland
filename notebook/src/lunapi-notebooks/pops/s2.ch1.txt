@@ -1,0 +1,43 @@
+% required:  ${s}          set to central channel to use
+% required:  ${mpath}      model path
+% required:  ${lib}        POPS library (e.g. s2)
+
+% optional:  ${do_edger}   run EDGER if set  [ default = no ]
+% optional:  ${do_reref}   reference to mastoid channel ${m}  [ default no, i.e. assume pre-referenced ]
+% optional:  ${m}          mastoid ref channel, needed if ${do_reref} == 1
+% optional:  ${no_filter}  no filtering, i.e. assume pre-filtered [ default = apply the filter ] 
+
+% make a copy, i.e. do not alter the original signal
+COPY sig=${s} tag=_F
+
+% optionally reference to mastoid (requires ${m} to be set to mastoid channel)
+[[ do_reref
+REFERENCE sig=${s}_F ref=${m}
+]] do_reref
+
+% resample, if needed (model is 128 Hz)
+RESAMPLE sig=${s}_F sr=128
+
+% optionally, apply bandpass filter
+[[ !no_filter
+FILTER sig=${s}_F bandpass=0.3,35 tw=0.2 ripple=0.01
+]] !no_filter
+
+% copy filtered signal to make a normalized signal
+COPY sig=${s}_F tag=_N
+ROBUST-NORM sig=${s}_F_N epoch winsor=0.002
+
+% optionally, run the EDGER tool (using only the filtered signal)
+[[ do_edger
+EDGER sig=${s}_F cache=ec1
+]] do_edger
+
+% run POPS
+POPS force-reload
+ path=${mpath}
+ lib=${lib}
+ cache=ec1
+ alias=CEN,ZEN|${s}_F,${s}_F_N
+
+% clean-up
+SIGNALS drop sig=${s}_F,${s}_F_N

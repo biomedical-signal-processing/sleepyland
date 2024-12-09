@@ -1,0 +1,48 @@
+/* Prediction response styling  */
+.response {
+    margin-top: 1rem;
+    padding: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #eee;
+}
+
+.scrollable-menu {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.btn-outline-primary {
+    color: #6ea8fe;
+    border-color: #6ea8fe;
+}
+
+.btn-outline-primary:hover {
+    color: black;
+    background-color: #6ea8fe;
+    border-color: #6ea8fe;
+}
+
+.btn-outline-primary:active {
+    background-color: #6ea8fe;
+    border-color: #6ea8fe;
+}
+
+.btn-outline-secondary:hover {
+    color: black;
+}
+
+.hypnogram-slide {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+}
+
+.hypnogram-slide.active {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+
+
+

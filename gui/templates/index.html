@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SleePyLand</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="../static/style.css">
+    <link rel="icon" href="../static/images/sleepyland_logo_dark.png" type="image/png">
+
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+</head>
+
+<body data-bs-theme="dark">
+<div class="container mt-5" style="padding-bottom: 50px">
+    <div class="card">
+
+        <div class="card-header text-black d-flex justify-content-between align-items-center" style="width: 100%;">
+            <img src="" id="logo" alt="sleep_icon" class="ms-2" style="width: 110px; height: 80px;">
+            <p class="text-body fst-italic text-center" style="flex-grow: 1; margin: 0;">
+                A Comprehensive Toolbox for Sleep Stage Classification
+            </p>
+        </div>
+
+        <div class="card-body">
+
+            <ul class="nav nav-tabs" id="myTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link active" id="form-tab" data-bs-toggle="tab" href="#form" role="tab"
+                       aria-controls="form" aria-selected="true">Home</a>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link" id="sleep-stages-tab" data-bs-toggle="tab" href="#sleep-stages-content"
+                       role="tab"
+                       aria-controls="sleep-stages-content" aria-selected="true">Hypnograms</a>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link" id="hypnodensity-tab" data-bs-toggle="tab" href="#hypnodensity-content"
+                       role="tab"
+                       aria-controls="sleep-stages-content" aria-selected="true">Hypnodensity</a>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link" id="performance-tab" data-bs-toggle="tab" href="#performance-content"
+                       role="tab"
+                       aria-controls="sleep-stages-content" aria-selected="true">Performances</a>
+                </li>
+                <!--<li class="nav-item" role="presentation">
+                    <a class="nav-link" id="sleep-dynamics-tab" data-bs-toggle="tab" href="#sleep-dynamics" role="tab"
+                       aria-controls="dynamics" aria-selected="false">Sleep Dynamics</a>
+                </li>-->
+            </ul>
+
+            <div class="tab-content mt-3" id="myTabContent">
+                <div class="tab-pane fade show active" id="form" role="tabpanel" aria-labelledby="form-tab">
+
+                    <div class="row mb align-items-center justi" style="padding-top: 20px">
+                        <div class="col-md-3">
+                            <button type="submit" class="btn w-100" id="tutorialButton"
+                                    onclick="window.open('http://127.0.0.1:8888/lab/tree/sleepyland-notebooks/quickstart_tutorial.ipynb')">
+                                Tutorial
+                            </button>
+                        </div>
+                        <div class="col-md-3">
+                            <button type="button" class="btn w-100" id="nsrrButton" data-bs-toggle="modal"
+                                    data-bs-target="#dataModal">NSRR Data
+                            </button>
+                        </div>
+                        <div class="col-md-3">
+                            <button type="button" class="btn btn-primary w-100" id="openSourceButton" disabled>OA Data
+                            </button>
+                        </div>
+                        <div class="col-md-3">
+                            <button type="button" class="btn btn-primary w-100" id="proprietaryDataButton">
+                                My EDF Data
+                            </button>
+                        </div>
+                    </div>
+
+                    <form id="uploadForm" method="post" enctype="multipart/form-data" action="javascript:sendRequest()">
+
+                        <div class="row mb-3 d-flex justify-content-between align-items-center" id="nsrrData-container"
+                             style="display:none !important;">
+
+                        </div>
+
+                        <br>
+                        <div id="download-container" style="display:none;">
+                            <div class="card" id="download-card">
+                                <div class="card-header">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h5 class="card-title font-weight-bold" style="margin-top: 5px">Download Data</h5>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div id="validationBadgeToken" class="badge bg-danger text-wrap mt-2 d-none">
+                                                Please insert the toker before downloading
+                                            </div>
+                                            <div id="validationBadgeSubjects" class="badge bg-danger text-wrap mt-2 d-none">
+                                                Please select at least one recording before downloading
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row mb-3 align-items-center">
+                                        <div class="col-md-6">
+                                            <label for="nsrrToken" class="form-label font-weight-bold">Insert NSRR
+                                                Token:</label>
+                                            <input type="text" class="form-control" id="nsrrToken" name="nsrrToken">
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <label for="dataset-select-download" class="form-label font-weight-bold">Select
+                                                the
+                                                NSRR dataset:</label>
+                                            <div class="dropdown">
+                                                <select class="form-select" id="dataset-select-download"
+                                                        name="dataset-select-download">
+                                                    <option value="abc" selected>abc</option>
+                                                    <option value="apoe">apoe</option>
+                                                    <option value="apples">apples</option>
+                                                    <option value="ccshs">ccshs</option>
+                                                    <option value="cfs">cfs</option>
+                                                    <option value="chat">chat</option>
+                                                    <option value="homepap">homepap</option>
+                                                    <option value="mesa">mesa</option>
+                                                    <option value="mnc_cnc">mnc_cnc</option>
+                                                    <option value="mnc_dhc">mnc_dhc</option>
+                                                    <option value="mnc_ssc">mnc_ssc</option>
+                                                    <option value="mros">mros</option>
+                                                    <option value="msp">msp</option>
+                                                    <option value="shhs">shhs</option>
+                                                    <option value="sof">sof</option>
+                                                    <option value="wsc">wsc</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <div class="row mb-3 align-items-center">
+                                        <div class="col-md-6">
+                                            <label class="form-label font-weight-bold">Select the
+                                                recordings:</label>
+                                            <div class="dropdown">
+                                                <button class="btn border dropdown-toggle w-100 text-start d-flex justify-content-between align-items-center "
+                                                        type="button" id="file-select-download-button"
+                                                        data-bs-toggle="dropdown"
+                                                        aria-expanded="false"
+                                                        style="background-color: #222529">
+                                                    - Select Recordings -
+                                                </button>
+                                                <ul class="dropdown-menu scrollable-menu" id="file-select-download"
+                                                    aria-labelledby="file-select-download">
+
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-3 align-content-center justify-content-center">
+                                        <button type="button" class="btn btn-secondary w-50" id="download-nsrr-files">
+                                            Download
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <br>
+                        </div>
+
+                        <div class="d-flex align-content-center justify-content-center" id="loading-gif-container"
+                             style="display:none !important;">
+                            <img src="../static/images/spinner_download.gif" class="spinner" id="loadingSpinner"
+                                 alt="Download in progress..." style="width: 140px; height: 90px">
+                        </div>
+
+
+                        <div id="input-form-container" style="display: none !important;">
+                            <div class="card" id="card-uploader">
+                                <div class="card-header">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h5 class="card-title font-weight-bold" style="margin-top: 5px">Upload Data</h5>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div id="validationBadgeEdf" class="badge bg-danger text-wrap mt-2 d-none">
+                                                Please select an EDF file before submitting
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="card-body">
+                                    <div id="uploader-container" style="display: none !important">
+                                        <div class="row mb-3 align-items-center">
+                                            <div class="col-md-12">
+                                                <label for="files" class="form-label font-weight-bold">Select a
+                                                    folder:</label>
+                                                <input type="file" class="form-control" id="files" name="files"
+                                                       webkitdirectory
+                                                       directory multiple>
+                                                <div id="folderCount" style="font-weight: bold;"></div>
+                                            </div>
+                                        </div>
+                                        <div class="row mb-3 align-items-center">
+                                            <div class="col-md-12">
+                                                <label for="dataset-select" class="form-label font-weight-bold">Select
+                                                    NSRR
+                                                    Dataset:</label>
+                                                <select class="form-select" id="dataset-select" name="dataset-select">
+                                                    <option value="abc" selected>abc</option>
+                                                    <option value="apoe">apoe</option>
+                                                    <option value="apples">apples</option>
+                                                    <option value="ccshs">ccshs</option>
+                                                    <option value="cfs">cfs</option>
+                                                    <option value="chat">chat</option>
+                                                    <option value="homepap">homepap</option>
+                                                    <option value="mesa">mesa</option>
+                                                    <option value="mnc_cnc">mnc_cnc</option>
+                                                    <option value="mnc_dhc">mnc_dhc</option>
+                                                    <option value="mnc_ssc">mnc_ssc</option>
+                                                    <option value="mros">mros</option>
+                                                    <option value="msp">msp</option>
+                                                    <option value="shhs">shhs</option>
+                                                    <option value="sof">sof</option>
+                                                    <option value="wsc">wsc</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div id="proprietary-uploader-container" style="display: none !important">
+                                        <div class="row mb-3 align-items-center">
+                                            <div class="col-md-12">
+                                                <label for="files" class="form-label font-weight-bold">Select an EDF
+                                                    file:</label>
+                                                <input type="file" class="form-control" id="edf-file" name="edf-file">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <br>
+                            <div class="card" id="channels-card">
+                                <div class="card-header">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h5 class="card-title font-weight-bold" style="margin-top: 5px">Insert the
+                                        output folder name and specify the channels</h5>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div id="validationBadgeChannels" class="badge bg-danger text-wrap mt-2 d-none">
+                                                Please select at least one channel before submitting
+                                            </div>
+                                            <div id="validationBadgeTypeChannels" class="badge bg-danger text-wrap mt-2 d-none">
+                                                Please select at least one type of channels before submitting
+                                            </div>
+                                            <div id="validationBadgeOutputFolder" class="badge bg-danger text-wrap mt-2 d-none">
+                                                Please insert the output folder name before submitting
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row mb-3 align-items-center" id="folderName-container">
+                                        <div class="col-md-12">
+                                            <label for="folderName" class="form-label font-weight-bold">Insert the
+                                                output
+                                                folder
+                                                name:</label>
+                                            <input type="text" class="form-control" id="folderName" name="folderName"
+                                                   required>
+                                        </div>
+                                    </div>
+
+                                    <div id="channel-selection-container">
+                                        <div class="row mb-3 align-items-center">
+                                            <div class="col-md-12">
+                                                <label for="dropdownMenuButtonEEG" class="form-label font-weight-bold">Select
+                                                    EEG
+                                                    Channels:</label>
+                                                <div class="dropdown">
+                                                    <button class="btn border dropdown-toggle w-100 text-start d-flex justify-content-between align-items-center text-wrap overflow-hidden"
+                                                            type="button" id="dropdownMenuButtonEEG"
+                                                            data-bs-toggle="dropdown"
+                                                            aria-expanded="false">
+                                                        All channels
+                                                    </button>
+                                                    <ul class="dropdown-menu scrollable-menu" id="eegChannelMenu"
+                                                        aria-labelledby="dropdownMenuButtonEEG">
+
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row mb-3 align-items-center">
+                                            <div class="col-md-12">
+                                                <label for="dropdownMenuButtonEOG" class="form-label font-weight-bold">Select
+                                                    EOG
+                                                    Channels:</label>
+                                                <div class="dropdown">
+                                                    <button class="btn border dropdown-toggle w-100 text-start d-flex justify-content-between align-items-center text-wrap overflow-hidden"
+                                                            type="button" id="dropdownMenuButtonEOG"
+                                                            data-bs-toggle="dropdown"
+                                                            aria-expanded="false">
+                                                        All channels
+                                                    </button>
+                                                    <ul class="dropdown-menu scrollable-menu" id="eogChannelMenu"
+                                                        aria-labelledby="dropdownMenuButtonEOG">
+
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div id="proprietary-channels-selection-container"
+                                         style="display: none !important;">
+                                        <div class="row mb-3 align-items-center">
+                                            <div class="col-md-12">
+                                                <label for="dropdown-menu-button-proprietary-channels"
+                                                       class="form-label font-weight-bold">Select the channel
+                                                    type:</label>
+                                                <div class="dropdown">
+                                                    <button class="btn border dropdown-toggle w-100 text-start d-flex justify-content-between align-items-center text-wrap overflow-hidden"
+                                                            type="button" id="dropdown-menu-button-proprietary-channels"
+                                                            data-bs-toggle="dropdown"
+                                                            aria-expanded="false">
+                                                        - Select channel type -
+                                                    </button>
+                                                    <ul class="dropdown-menu scrollable-menu"
+                                                        id="dropdown-menu-button-proprietary-channels-select"
+                                                        aria-labelledby="dropdownMenuButtonEEG">
+                                                        <li><label class="form-check ms-2"><input type="checkbox"
+                                                                                                  class="form-check-input"
+                                                                                                  name="select-channels-proprietary"
+                                                                                                  value="eeg"
+                                                                                                  checked="">EEG</label>
+                                                        </li>
+                                                        <li><label class="form-check ms-2"><input type="checkbox"
+                                                                                                  class="form-check-input"
+                                                                                                  name="select-channels-proprietary"
+                                                                                                  value="eog"
+                                                                                                  checked="">EOG</label>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <!--                            <div class="row mb-3 align-items-center">-->
+                                <!--                                <div class="col-md-6">-->
+                                <!--                                    <label for="dropdownMenuButtonEMG" class="form-label font-weight-bold">Select EMG-->
+                                <!--                                        Channel:</label>-->
+                                <!--                                    <div class="dropdown">-->
+                                <!--                                        <button class="btn border dropdown-toggle w-100 text-start d-flex justify-content-between align-items-center text-wrap overflow-hidden"-->
+                                <!--                                                type="button" id="dropdownMenuButtonEMG" data-bs-toggle="dropdown"-->
+                                <!--                                                aria-expanded="false">-->
+                                <!--                                            All channels-->
+                                <!--                                        </button>-->
+                                <!--                                        <ul class="dropdown-menu scrollable-menu" id="emgChannelMenu"-->
+                                <!--                                            aria-labelledby="dropdownMenuButtonEMG">-->
+                                <!--                                        </ul>-->
+                                <!--                                    </div>-->
+                                <!--                                </div>-->
+                                <!--                            </div>-->
+                            </div>
+                            <br>
+                            <div id="algorithms-select" class="card"
+                                 style="display: none !important;">
+                                <div class="card-header">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h5 class="card-title font-weight-bold" style="margin-top: 5px">Sleep
+                                                Staging
+                                                Models</h5>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div id="validationBadgeAlgorithms" class="badge bg-danger text-wrap mt-2 d-none">
+                                                Please select at least one model before submitting
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-body row mb-2">
+                                    <div class="row" style="margin: 0">
+                                        <label class="form-label font-weight-bold">Select a set of models for sleep
+                                            staging:</label>
+                                    </div>
+                                    <div class="row mb-4 align-items-center justify-content-center" style="margin: 0">
+                                        <div class="col-md-4">
+                                            <div class="card">
+                                                <div class="card-body">
+                                                    <p><b>Features-Based Models:</b></p>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="pops"
+                                                               name="pops" disabled="">
+                                                        <label class="form-check-label" for="pops">POPS (Luna)</label>
+                                                        <a href="https://zzz.bwh.harvard.edu/luna/" target="_blank"
+                                                           class="ms-2" title="Luna Resources"
+                                                           style="color: white; text-decoration: none;">
+                                                            <i class="bi bi-info-circle"></i>
+                                                        </a>
+                                                    </div>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="yasa"
+                                                               name="yasa">
+                                                        <label class="form-check-label" for="yasa">YASA</label>
+                                                        <a href="https://doi.org/10.7554/eLife.70092" target="_blank"
+                                                           class="ms-2" title="Vallat R. (2021)"
+                                                           style="color: white; text-decoration: none;">
+                                                            <i class="bi bi-info-circle"></i>
+                                                        </a>
+                                                    </div>
+                                                    <div class="form-check">
+                                                    </div>
+                                                    <div class="form-check">
+                                                    </div>
+                                                    <div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-8">
+                                            <div class="card">
+                                                <div class="card-body">
+                                                    <div class="row justify-content-center">
+                                                        <div class="col-md-5">
+                                                            <p><b>DL-Based Models:</b></p>
+                                                            <div class="form-check">
+                                                                <input class="form-check-input" type="checkbox"
+                                                                       id="deepresnet"
+                                                                       name="deepresnet">
+                                                                <label class="form-check-label"
+                                                                       for="deepresnet">DeepResNet</label>
+                                                                <a href="https://doi.org/10.1093/sleep/zsaa161"
+                                                                   target="_blank"
+                                                                   class="ms-2" title="Olesen A. (2021)"
+                                                                   style="color: white; text-decoration: none;">
+                                                                    <i class="bi bi-info-circle"></i>
+                                                                </a>
+                                                            </div>
+
+                                                            <div class="form-check">
+                                                                <input class="form-check-input" type="checkbox"
+                                                                       id="lseqsleepnet"
+                                                                       name="lseqsleepnet" disabled>
+                                                                <label class="form-check-label" for="lseqsleepnet">L-SeqSleepNet</label>
+                                                                <a href="https://doi.org/10.1109/JBHI.2023.3303197"
+                                                                   target="_blank"
+                                                                   class="ms-2" title="Phan H. (2023)"
+                                                                   style="color: white; text-decoration: none;">
+                                                                    <i class="bi bi-info-circle"></i>
+                                                                </a>
+                                                            </div>
+                                                            <div class="form-check">
+                                                                <input class="form-check-input" type="checkbox"
+                                                                       id="transformer"
+                                                                       name="transformer">
+                                                                <label class="form-check-label"
+                                                                       for="transformer">Transformer</label>
+                                                                <a href="https://doi.org/10.1109/TBME.2022.3147187"
+                                                                   target="_blank"
+                                                                   class="ms-2" title="Phan H. (2022)"
+                                                                   style="color: white; text-decoration: none;">
+                                                                    <i class="bi bi-info-circle"></i>
+                                                                </a>
+                                                            </div>
+                                                            <div class="form-check">
+                                                                <input class="form-check-input" type="checkbox"
+                                                                       id="usleep"
+                                                                       name="usleep">
+                                                                <label class="form-check-label"
+                                                                       for="usleep">USleep</label>
+                                                                <a href="https://doi.org/10.1038/s41746-021-00440-5"
+                                                                   target="_blank"
+                                                                   class="ms-2" title="Perslev M. (2021)"
+                                                                   style="color: white; text-decoration: none;">
+                                                                    <i class="bi bi-info-circle"></i>
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-3">
+                                                            <p><b>Ensemble:</b></p>
+                                                            <div class="form-check">
+                                                                <input class="form-check-input" type="checkbox"
+                                                                       id="ensemble"
+                                                                       name="ensemble">
+                                                                <label class="form-check-label"
+                                                                       for="ensemble">Unweighted arithmetic mean</label>
+                                                            </div>
+                                                            <div class="form-check">
+                                                            </div>
+                                                            <div class="form-check">
+                                                            </div>
+                                                            <div class="form-check">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row align-items-center justify-content-center" style="margin: 0">
+                                        <div class="col-md-6">
+                                            <button type="submit" class="btn w-100 btn-outline-primary"
+                                                    id="submitButton">
+                                                Evaluate
+                                            </button>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <button type="button" class="btn w-100 btn-outline-primary"
+                                                    id="predictButton"
+                                                    disabled="">Predict
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <br>
+
+                        <div class="row mb-2 align-items-center justify-content-center"
+                             id="notebookResetButtonsContainer" style="display: none !important; margin: 0">
+                            <div class="col-md-6">
+                                <button type="button" class="btn btn-warning w-100" id="notebookButton"
+                                        onclick="window.open('http://127.0.0.1:8888/lab')">Open Notebook
+                                </button>
+                            </div>
+                            <div class="col-md-6">
+                                <button type="button" class="btn btn-secondary w-100" id="resetButton"
+                                        onclick="window.location.reload()">Reset
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="tab-pane fade" id="sleep-stages-content" role="tabpanel" aria-labelledby="sleep-stages-tab">
+                    <div id="resultsContent">
+                        <p id="status">No data to display</p>
+                        <div id="results">
+                            <div id="card-container"></div>
+                            <div id="nextPrevButtonDiv" class="d-flex justify-content-between my-3"
+                                 style="display: none !important">
+                                <button class="btn btn-secondary" id="prev">Previous</button>
+                                <button class="btn btn-secondary" id="next">Next</button>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="hypnodensity-content" role="tabpanel" aria-labelledby="hypnodensity-tab">
+                    <div id="resultsContentHypnodensity">
+                        <p id="statusHypno">No data to display</p>
+                        <div id="resultsHypno">
+                            <div id="card-container-hypno"></div>
+                            <div id="nextPrevButtonDivHypno" class="d-flex justify-content-between my-3"
+                                 style="display: none !important">
+                                <button class="btn btn-secondary" id="prevHypno">Previous</button>
+                                <button class="btn btn-secondary" id="nextHypno">Next</button>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="performance-content" role="tabpanel" aria-labelledby="performance-tab">
+                    <div id="resultsContentPerformance">
+                        <p id="statusPerformance">No data to display</p>
+                        <div id="resultsPerformance">
+                            <div id="card-container-performance"></div>
+                            <div id="testPerformances"></div>
+                            <div id="nextPrevButtonDivPerformance" class="d-flex justify-content-between my-3"
+                                 style="display: none !important">
+                                <button class="btn btn-secondary" id="prevPerformance">Previous</button>
+                                <button class="btn btn-secondary" id="nextPerformance">Next</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!--<div class="tab-pane fade" id="sleep-dynamics" role="tabpanel" aria-labelledby="sleep-dynamics-tab">
+                    <p class="text-body" id="status-sleep-dynamics"></p>
+                    <div class="row">
+                        <div class="col-md-6" id="P_M_heatmap-container" style="height: 500px;"></div>
+                        <div class="col-md-6" id="P_heatmap-container" style="height: 500px;"></div>
+                    </div>
+                    <table class="table table-striped table-bordered" id="metrics-table">
+                        <thead class="table-dark">
+                        <tr></tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>-->
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="dataModal" tabindex="-1" aria-labelledby="dataModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="dataModalLabel">NSRR Data</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Select an option to upload or download data.
+            </div>
+            <div class="modal-footer d-flex justify-content-between">
+                <button type="button" class="btn btn-primary" id="uploadButton">Upload Data</button>
+                <button type="button" class="btn btn-primary" id="downloadNsrrButton">Download Data</button>
+            </div>
+        </div>
+    </div>
+    <div class="card-footer text-muted">&copy; 2024 SUPSI</div>
+</div>
+
+<div class="modal fade" id="sleepDynamicsModal" tabindex="-1" aria-labelledby="sleepDynamicsModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="sleepDynamicsModalLabel">Select the parameters</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="sleepDynamicsForm">
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="ageSelect" class="form-label">Age</label>
+                                <select class="form-select" id="ageSelect">
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="genderSelect" class="form-label">Gender</label>
+                                <select class="form-select" id="genderSelect">
+                                    <option value="m">Male</option>
+                                    <option value="f">Female</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="studySelect" class="form-label">Study</label>
+                        <select class="form-select" id="studySelect">
+                        </select>
+                    </div>
+
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary" id="submitSleepDynamics">Submit</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="errorDynamicsModal" tabindex="-1" role="dialog" aria-labelledby="errorDynamicsModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="errorDynamicsModalLabel">Error</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                        id="errorDynamicsCloseButtonX"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-body">You have to do a prediction</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" id="errorDynamicsCloseButton">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="../static/read_files.js"></script>
+<script src="../static/script.js"></script>
+</body>
+
+</html>
+

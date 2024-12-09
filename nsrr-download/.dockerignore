@@ -1,0 +1,17 @@
+# Ignore everything by default
+**
+
+# But include the Dockerfile in the current folder
+!Dockerfile
+# !build_docker_img/Dockerfile
+
+# And include any necessary files or directories within a folder
+!requirements.txt
+!nsrr_download.sh
+!environment.yaml
+!nsrr-download.py
+# e.g.
+# !build_docker_img/*.sh
+# !build_docker_img/*.py
+# !build_docker_img/requirements.txt
+# !build_docker_img/environment.yml

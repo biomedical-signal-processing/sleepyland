@@ -1,0 +1,12 @@
+# Ignore everything by default
+**
+
+!Dockerfile
+
+!requirements.txt
+!environment.yaml
+!run_extract.sh
+!run_extract_hypno.sh
+!setup.py
+
+!src/*

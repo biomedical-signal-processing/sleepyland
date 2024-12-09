@@ -1,0 +1,6 @@
+name: wtfancy
+channels:
+  - defaults
+dependencies:
+  - python
+  - pip

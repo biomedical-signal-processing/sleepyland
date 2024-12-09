@@ -1,0 +1,62 @@
+# Ignore the .idea directory (for JetBrains IDEs)
+.idea/
+
+# Ignore node_modules directory (for Node.js projects)
+node_modules/
+input/
+output/
+
+# Ignore logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Ignore build directories
+dist/
+build/
+
+# Ignore environment variable files
+.env
+.env.local
+.env.*.local
+
+# Ignore temporary files and directories
+tmp/
+temp/
+*.swp
+*.swo
+
+# Ignore compiled code
+*.out
+*.class
+*.o
+*.so
+
+# Ignore system files
+.DS_Store
+Thumbs.db
+
+# Ignore coverage directory
+coverage/
+
+# Ignore dependency directories
+vendor/
+
+# Ignore Python specific files
+__pycache__/
+*.py[cod]
+*.egg
+*.egg-info/
+.eggs/
+
+# Ignore IDE specific files
+.vscode/
+*.code-workspace
+
+# Ignore other files
+*.iml
+*.ipr
+*.iws
+/notebook/src/sleepyland-notebooks/tutorial/

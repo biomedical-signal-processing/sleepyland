@@ -1,0 +1,74 @@
+services:
+  gui:
+    image: bspsupsi/sleepyland:gui  # Use the image from Docker Hub
+    build:
+      context: ./gui
+    container_name: gui_container
+    ports:
+      - "8887:8887"
+    depends_on:
+      - manager-api
+    volumes:
+      - ./input:/app/input
+      - ./output:/app/output
+
+  manager-api:
+    image: bspsupsi/sleepyland:manager-api  # Use the image from Docker Hub
+    build:
+      context: ./manager-api
+    container_name: manager_container
+    ports:
+      - "8989:8989"
+    volumes:
+      - ./input:/app/input
+      - ./output:/app/output
+
+  notebook:
+    image: bspsupsi/sleepyland:notebook  # Use the image from Docker Hub
+    build:
+      context: ./notebook
+    container_name: notebook_container
+    ports:
+      - "8888:8888"
+    volumes:
+      - ./my-notebook:/app/my-notebook
+      - ./input:/app/input
+      - ./output:/app/output
+
+  nsrr-download:
+    image: bspsupsi/sleepyland:nsrr-download  # Use the image from Docker Hub
+    build:
+      context: ./nsrr-download
+    container_name: nsrr_download_container
+    ports:
+      - "8500:8500"
+    volumes:
+      - ./input:/app/input
+      - ./output:/app/output
+
+  usleepyland:
+    image: bspsupsi/sleepyland:usleepyland  # Use the image from Docker Hub
+    build:
+      context: ./usleepyland
+    container_name: usleepyland_container
+    ports:
+      - "7777:7777"
+    volumes:
+      - ./input:/app/input
+      - ./output:/app/output
+
+  wild-to-fancy:
+    image: bspsupsi/sleepyland:wild-to-fancy
+    build:
+      context: wild-to-fancy
+    container_name: wild_to_fancy_container
+    ports:
+      - "6666:6666"
+    volumes:
+      - ./input:/app/input
+      - ./output:/app/output
+
+volumes:
+  my-notebook:
+  input:
+  output:

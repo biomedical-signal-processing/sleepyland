@@ -1,0 +1,9 @@
+# Ignore everything by default
+**
+
+!Dockerfile
+
+!requirements.txt
+!src/api.py
+!src/utils.py
+!src/ensemble.py

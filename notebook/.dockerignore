@@ -1,0 +1,7 @@
+# Ignore everything by default
+**
+
+!Dockerfile
+
+!src/*
+!resources/*

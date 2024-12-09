@@ -1,0 +1,257 @@
+{
+    "datasets": [
+        {
+            "name": "abc",
+            "command_template": [
+                "python",
+                "/app/wild-to-fancy/wtfancy/bin/wtf.py",
+                "extract",
+                "--file_regex", "{file_regex}",
+                "--out_dir", "{out_dir}",
+                "--resample", "128",
+                "--channels", "F3-M2", "F4-M1", "C3-M2", "C4-M1", "O1-M2", "O2-M1", "E1-M2", "E2-M1", "Chin1", "Chin2", "Chin3",
+                "--seed", "123",
+                "--overwrite"
+            ]
+        },
+        {
+            "name": "apoe",
+            "command_template": [
+                "python",
+                "/app/wild-to-fancy/wtfancy/bin/wtf.py",
+                "extract",
+                "--file_regex", "{file_regex}",
+                "--out_dir", "{out_dir}",
+                "--resample", "128",
+                "--channels", "C3/A2", "C4/A1", "O1/A2", "O2/A1", "LOC/A2", "ROC/A1", "C3_A1", "C3_A2", "C3_O1", "C4_A1", "C4_A2", "F1_A2", "F2_C4", "F2_T4", "FP1_C3", "Fp1_C3", "FP2_C4", "Fp2_C4", "Fz_A1", "Fz_A2", "01_A2", "O1_A2", "O2_A1", "T3_O1", "T4_O2", "LOC_A2", "L_EOG", "R_EOG", "ROC_A1", "LOC", "ROC", "Chin_EMG", "Chin2_EMG", "Chin_L", "Chin_R", "Chin_Ctr", "C3-A1", "C3-A2", "C3-O1", "C4-A1", "C4-A2", "F1-A2", "F2-C4", "F2-T4", "FP1-C3", "Fp1-C3", "FP2-C4", "Fp2-C4", "Fz-A1", "Fz-A2", "01-A2", "O1-A2", "O2-A1", "T3-O1", "T4-O2", "LOC-A2", "L-EOG", "R-EOG", "ROC-A1", "Chin-EMG", "Chin2-EMG", "Chin-L", "Chin-R", "Chin-Ctr",
+                "--rename_channels", "C3-A2", "C4-A1", "O1-A2", "O2-A1", "LOC-A2", "ROC-A1", "C3-A1", "C3-A2", "C3-O1", "C4-A1", "C4-A2", "F1-A2", "F2-C4", "F2-T4", "FP1-C3", "FP1-C3", "FP2-C4", "FP2-C4", "Fz-A1", "Fz-A2", "O1-A2", "O1-A2", "O2-A1", "T3-O1", "T4-O2", "LOC-A2", "LOC", "ROC", "ROC-A1", "LOC", "ROC", "Chin_EMG", "Chin2_EMG", "Chin_L", "Chin_R", "Chin_Ctr", "C3-A1", "C3-A2", "C3-O1", "C4-A1", "C4-A2", "F1-A2", "F2-C4", "F2-T4", "FP1-C3", "FP1-C3", "FP2-C4", "FP2-C4", "Fz-A1", "Fz-A2", "O1-A2", "O1-A2", "O2-A1", "T3-O1", "T4-O2", "LOC-A2", "LOC", "ROC", "ROC-A1", "Chin-EMG", "Chin2-EMG", "Chin-L", "Chin-R", "Chin-Ctr",
+                "--seed", "123",
+                "--overwrite"
+            ]
+        },
+        {
+            "name": "apples",
+            "command_template": [
+                "python",
+                "/app/wild-to-fancy/wtfancy/bin/wtf.py",
+                "extract",
+                "--file_regex", "{file_regex}",
+                "--out_dir", "{out_dir}",
+                "--resample", "128",
+                "--channels", "C3_M2", "C4_M1", "O1_M2", "O2_M1", "E1", "E2", "EMG", "EEG_C3_A2", "EEG_C4_A1", "EEG_O1_A2", "EEG_O2_A1", "EOG_Left", "EOG_Right", "EMG_Chin",
+                "--rename_channels", "C3-M2", "C4-M1", "O1-M2", "O2-M1", "LOC", "ROC", "EMG", "C3-M2", "C4-M1", "O1-M2", "O2-M1", "LOC", "ROC", "EMG",
+                "--seed", "123",
+                "--overwrite"
+            ]
+        },
+        {
+            "name": "ccshs",
+            "command_template": [
+                "python",
+                "/app/wild-to-fancy/wtfancy/bin/wtf.py",
+                "extract",
+                "--file_regex", "{file_regex}",
+                "--out_dir", "{out_dir}",
+                "--resample", "128",
+                "--channels", "C3-A2", "C4-A1", "LOC-A2", "ROC-A1", "EMG1", "EMG2", "EMG3",
+                "--overwrite"
+            ]
+        },
+        {
+            "name": "cfs",
+            "command_template": [
+                "python",
+                "/app/wild-to-fancy/wtfancy/bin/wtf.py",
+                "extract",
+                "--file_regex", "{file_regex}",
+                "--out_dir", "{out_dir}",
+                "--resample", "128",
+                "--channels", "C3-A2", "C4-A1", "LOC-A2", "ROC-A1", "EMG1", "EMG2", "EMG3",
+                "--overwrite"
+            ]
+        },
+        {
+            "name": "chat",
+            "command_template": [
+                "python",
+                "/app/wild-to-fancy/wtfancy/bin/wtf.py",
+                "extract",
+                "--file_regex", "{file_regex}",
+                "--out_dir", "{out_dir}",
+                "--resample", "128",
+                "--channels", "F3-M2", "F4-M1", "C3-M2", "C4-M1", "T3-M2", "T4-M1", "O1-M2", "O2-M1", "E1-M2",
+                              "E2-M1", "E1", "E2", "Cchin", "Lchin", "Rchin", "LCHIN-RCHIN",
+                "--rename_channels", "F3-M2", "F4-M1", "C3-M2", "C4-M1", "T3-M2", "T4-M1", "O1-M2", "O2-M1", "E1-M2",
+                              "E2-M1", "E1", "E2", "Cchin", "Lchin", "Rchin", "LCHIN-RCHIN",
+                "--seed", "123",
+                "--overwrite"
+            ]
+        },
+        {
+            "name": "homepap",
+            "command_template": [
+                "python",
+                "/app/wild-to-fancy/wtfancy/bin/wtf.py",
+                "extract",
+                "--file_regex", "{file_regex}",
+                "--out_dir", "{out_dir}",
+                "--resample", "128",
+                "--channels", "F4-M1", "C4-M1", "O2-M1", "C3-M2", "F3-M2", "O1-M2", "F4", "C4", "O2", "C3", "F3", "O1", "E1", "E1-M2", "E_1-M2", "L-EOG", "E2", "E2-M1", "E_2-M1", "R-EOG", "E1-E2", "chin", "Cchin", "Lchin", "Rchin", "Rchon", "LCHIN-CCHIN",
+                "--rename_channels", "F4-M1", "C4-M1", "O2-M1", "C3-M2", "F3-M2", "O1-M2", "F4", "C4", "O2", "C3", "F3", "O1", "E1", "E1-M2", "E1-M2", "LOC", "E2", "E2-M1", "E2-M1", "ROC", "E1-E2", "Cchin", "Cchin", "Lchin", "Rchin", "Rchin", "Lchin-Cchin",
+                "--seed", "123",
+                "--overwrite"
+            ]
+        },
+        {
+            "name": "mesa",
+            "command_template": [
+                "python",
+                "/app/wild-to-fancy/wtfancy/bin/wtf.py",
+                "extract",
+                "--file_regex", "{file_regex}",
+                "--out_dir", "{out_dir}",
+                "--resample", "128",
+                "--channels", "EEG1", "EEG2", "EEG3", "EOG-L", "EOG-R", "EMG",
+                "--rename_channels", "Fz-Cz", "Cz-Oz", "C4-M1", "E1-FPz", "E2-FPz", "EMG",
+                "--seed", "123",
+                "--overwrite"
+            ]
+        },
+        {
+            "name": "mnc_cnc",
+            "command_template": [
+                "python",
+                "/app/wild-to-fancy/wtfancy/bin/wtf.py",
+                "extract",
+                "--file_regex", "{file_regex}",
+                "--out_dir", "{out_dir}",
+                "--resample", "128",
+                "--channels", "C3-M2", "C3", "C4-M1", "C4", "Cz", "F3-M2", "F3", "F4-M1", "F4", "O1-M2", "O1", "O2-M1", "O2", "E1-M2", "E1", "E2-M1", "E2", "cchin", "cchin_l", "chin",
+                "--seed", "123",
+                "--overwrite"
+            ]
+        },
+        {
+            "name": "mnc_dhc",
+            "command_template": [
+                "python",
+                "/app/wild-to-fancy/wtfancy/bin/wtf.py",
+                "extract",
+                "--file_regex", "{file_regex}",
+                "--out_dir", "{out_dir}",
+                "--resample", "128",
+                "--channels", "C3-M2", "C3", "C4-M1", "C4", "Cz", "F3-M2", "F3", "F4-M1", "F4", "O1-M2", "O1", "O2-M1", "O2", "E1-M2", "E1", "E2-M1", "E2", "cchin", "cchin_l", "chin",
+                "--seed", "123",
+                "--overwrite",
+                "--del_nsrr_names"
+            ]
+        },
+        {
+            "name": "mnc_ssc",
+            "command_template": [
+                "python",
+                "/app/wild-to-fancy/wtfancy/bin/wtf.py",
+                "extract",
+                "--file_regex", "{file_regex}",
+                "--out_dir", "{out_dir}",
+                "--resample", "128",
+                "--channels", "C3-M2", "C3", "C4-M1", "C4", "Cz", "F3-M2", "F3", "F4-M1", "F4", "O1-M2", "O1", "O2-M1", "O2", "E1-M2", "E1", "E2-M1", "E2", "cchin", "cchin_l", "chin",
+                "--seed", "123",
+                "--overwrite",
+                "--del_nsrr_names"
+            ]
+        },
+        {
+            "name": "mros",
+            "command_template": [
+                "python",
+                "/app/wild-to-fancy/wtfancy/bin/wtf.py",
+                "extract",
+                "--file_regex", "{file_regex}",
+                "--out_dir", "{out_dir}",
+                "--resample", "128",
+                "--channels", "C3-M2", "C4-M1", "E1-M2", "E2-M1", "E1", "E2", "LChin", "RChin", "L Chin", "R Chin", "L_CHIN-R_CHIN",
+                "--seed", "123",
+                "--overwrite",
+                "--del_nsrr_names"
+            ]
+        },
+        {
+            "name": "msp",
+            "command_template": [
+                "python",
+                "/app/wild-to-fancy/wtfancy/bin/wtf.py",
+                "extract",
+                "--file_regex", "{file_regex}",
+                "--out_dir", "{out_dir}",
+                "--resample", "128",
+                "--channels", "C3_M2", "C4_M1", "F3_M2", "F4_M1", "O1_M2", "O2_M1", "LOC", "ROC", "EMG1", "EMG2",
+                "--rename_channels", "C3_M2", "C4_M1", "F3_M2", "F4_M1", "O1_M2", "O2_M1", "LOC", "ROC", "EMG1", "EMG2",
+                "--seed", "123",
+                "--overwrite"
+            ]
+        },
+        {
+            "name": "nchsdb",
+            "command_template": [
+                "python",
+                "/app/wild-to-fancy/wtfancy/bin/wtf.py",
+                "extract",
+                "--file_regex", "{file_regex}",
+                "--out_dir", "{out_dir}",
+                "--resample", "128",
+                "--channels", "FP1", "FP2", "FZ", "CZ", "PZ", "OZ", "FPZ", "P3-M2", "P4-M1", "F3-M2", "F4-M1", "C3-M2", "C4-M1", "T3-M2", "T4-M1", "O1-M2", "O2-M1", "E1-M2", "E2-M1", "E1", "E2",
+                "EEG F4-M1", "EEG F3-M2", "EEG C4-M1", "EEG C3-M2", "EEG O2-M1", "EEG O1-M2", "EOG_LOC-M2 EOG_ROC-M1", "EMG_CHIN1-CHIN2", "EEG_F4-EEG_M1", "EEG_F4-M2", "EEG_F3-EEG_M2", "EEG_C4-EEG_M1", "EEG_C4-M2", "EEG_C3-EEG_M2", "EEG_O2-EEG_M1", "EEG_O1-EEG_M2", "EOG_LOC-EEG_M2", "EOG_ROC-EEG_M1", "EMG_CHIN1-EMG_CHIN2", "CHIN1", "CHIN2", "CHIN3", "EEG_CHIN1", "EEG_CHIN2", "EEG_CHIN3", "EMG_CHIN1-CHIN3", "EEG_CHIN1-CHIN3", "EEG_CHIN1-CHIN2 EEG_CHIN3-CHIN2", "EEG_ROC-M1", "EEG_ROC-M2", "EEG_LOC-M1", "EEG_LOC-M2", "EEG_E1", "EEG_E2",
+                "--rename_channels", "FP1", "FP2", "FZ", "CZ", "PZ", "OZ", "FPZ", "P3-M2", "P4-M1", "F3-M2", "F4-M1", "C3-M2", "C4-M1", "T3-M2", "T4-M1", "O1-M2", "O2-M1", "E1-M2", "E2-M1", "E1", "E2", "F4-M1", "F3-M2", "C4-M1", "C3-M2", "O2-M1", "O1-M2", "E1-M2", "E2-M1", "CHIN1-CHIN2", "F4-M1", "F4-M2", "F3-M2 C4-M1 C4-M2", "C3-M2", "O2-M1", "O1-M2", "E1-M2", "E2-M1", "CHIN1-CHIN2", "CHIN1", "CHIN2", "CHIN3", "CHIN1", "CHIN2", "CHIN3", "CHIN1-CHIN3", "CHIN1-CHIN3", "CHIN1-CHIN2", "CHIN3-CHIN2", "E2-M1", "E2-M2", "E1-M1", "E1-M2", "E1", "E2",
+                "--seed", "123",
+                "--overwrite"
+            ]
+        },
+        {
+            "name": "shhs",
+            "command_template": [
+                "python",
+                "/app/wild-to-fancy/wtfancy/bin/wtf.py",
+                "extract",
+                "--file_regex", "{file_regex}",
+                "--out_dir", "{out_dir}",
+                "--resample", "128",
+                "--channels", "EEG", "EEG(sec)", "EEG_SEC", "EEG_2", "EEG2", "EOG(L)", "EOG(R)", "EMG",
+                "--rename_channels", "C4-A1", "C3-A2", "C3-A2", "C3-A2", "C3-A2", "EOG(L)-PG1", "EOG(R)-PG1", "EMG",
+                "--seed", "123",
+                "--overwrite"
+            ]
+        },
+        {
+            "name": "sof",
+            "command_template": [
+                "python",
+                "/app/wild-to-fancy/wtfancy/bin/wtf.py",
+                "extract",
+                "--file_regex", "{file_regex}",
+                "--out_dir", "{out_dir}",
+                "--resample", "128",
+                "--channels", "C3-A2", "C4-A1", "LOC-A2", "ROC-A1", "L Chin", "R Chin", "EMG/L", "EMG/R",
+                "--rename_channels", "C3-A2", "C4-A1", "LOC-A2", "ROC-A1", "LChin", "RChin", "LChin", "RChin",
+                "--seed", "123",
+                "--overwrite"
+            ]
+        },
+        {
+            "name": "wsc",
+            "command_template": [
+                "python",
+                "/app/wild-to-fancy/wtfancy/bin/wtf.py",
+                "extract",
+                "--file_regex", "{file_regex}",
+                "--out_dir", "{out_dir}",
+                "--resample", "128",
+                "--channels", "F3_M1", "F3_M2", "F3_AVG", "F4_M1", "F4_M2", "F4_AVG", "Fz_M1", "Fz_M2", "Fz_AVG", "Cz_M1", "Cz_M2", "Cz_AVG", "C3_M1", "C3_M2", "C3_AVG", "C4_M1", "C4_M2", "C4_AVG", "Pz_M1", "Pz_M2", "Pz_AVG", "Pz_Cz", "O1_M1", "O1_M2", "O1_AVG", "O2_M1", "O2_M2", "O2_AVG", "E1", "E2", "chin", "cchin_l", "cchin_r", "rchin_l",
+                "--rename_channels", "F3-M1", "F3-M2", "F3-AVG", "F4-M1", "F4-M2", "F4-AVG", "Fz-M1", "Fz-M2", "Fz-AVG", "Cz-M1", "Cz-M2", "Cz-AVG", "C3-M1", "C3-M2", "C3-AVG", "C4-M1", "C4-M2", "C4-AVG", "Pz-M1", "Pz-M2", "Pz-AVG", "Pz-Cz", "O1-M1", "O1-M2", "O1-AVG", "O2-M1", "O2-M2", "O2-AVG", "E1", "E2", "chin", "cchin_l", "cchin_r", "rchin_l",
+                "--seed", "123",
+                "--overwrite",
+                "--del_nsrr_names"
+            ]
+        }
+    ]
+}

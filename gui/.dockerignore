@@ -1,0 +1,11 @@
+# Ignore everything by default
+**
+
+!Dockerfile
+
+!requirements.txt
+!app.py
+
+!app/*
+!templates/*
+!static/*

@@ -1,0 +1,101 @@
+
+% --------------------------------------------------------------------------------
+% Declare any channels used (required), sample rates
+% --------------------------------------------------------------------------------
+
+% trained channel label = generic 'CEN'
+%  CEN central EEG, filtered
+%  ZEN central EEG, normed
+
+CH CEN 128 uV
+CH ZEN 128 uV
+   
+% --------------------------------------------------------------------------------
+% Level 1 features
+%  block : feature {key=value key=value}
+% --------------------------------------------------------------------------------
+
+spec1: SPEC     CEN lwr=0.75 upr=25 
+spec2: SPEC     ZEN lwr=0.75 upr=25 
+
+rspec1: RSPEC    CEN lwr=0.75 upr=25 z-lwr=0.75 z-upr=25
+rspec2: RSPEC    ZEN lwr=0.75 upr=25 z-lwr=0.75 z-upr=25
+
+misc1: FD       ZEN 
+misc1: PE       ZEN from=4 to=4
+misc1: HJORTH   ZEN 
+
+% --------------------------------------------------------------------------------
+% Epoch/row exclusions based on level-1 features
+% --------------------------------------------------------------------------------
+
+misc1: OUTLIERS th=10
+
+% --------------------------------------------------------------------------------
+% Level 2 features: 
+%  to-block: feature block=from-block {key=value}
+% --------------------------------------------------------------------------------
+
+spec1.svd:  SVD block=spec1  nc=6 file=s2.spec1.svd
+spec2.svd:  SVD block=spec2  nc=6 file=s2.spec2.svd
+
+rspec1.svd:  SVD block=rspec1  nc=4 file=s2.rspec1.svd
+rspec2.svd:  SVD block=rspec2  nc=4 file=s2.rspec2.svd
+
+% --------------------------------------------------------------------------------
+% Temporal smoothing
+% --------------------------------------------------------------------------------
+
+spec1.svd.smoothed1:  SMOOTH block=spec1.svd  half-window=2
+spec2.svd.smoothed1:  SMOOTH block=spec2.svd  half-window=2
+misc1.smoothed1:      SMOOTH block=misc1      half-window=2
+
+spec1.svd.smoothed2:  SMOOTH block=spec1.svd  half-window=10
+spec2.svd.smoothed2:  SMOOTH block=spec2.svd  half-window=10
+misc1.smoothed2:      SMOOTH block=misc1      half-window=10
+
+spec1.svd.smoothed3:  SMOOTH block=spec1.svd  half-window=25
+spec2.svd.smoothed3:  SMOOTH block=spec2.svd  half-window=25
+misc1.smoothed3:      SMOOTH block=misc1      half-window=25
+
+rspec1.svd.smoothed1:  SMOOTH block=rspec1.svd  half-window=2
+rspec2.svd.smoothed1:  SMOOTH block=rspec2.svd  half-window=2
+
+rspec1.svd.smoothed2:  SMOOTH block=rspec1.svd  half-window=10
+rspec2.svd.smoothed2:  SMOOTH block=rspec2.svd  half-window=10
+
+rspec1.svd.smoothed3:  SMOOTH block=rspec1.svd  half-window=25
+rspec2.svd.smoothed3:  SMOOTH block=rspec2.svd  half-window=25
+
+% --------------------------------------------------------------------------------
+% Normalize 
+% --------------------------------------------------------------------------------
+
+zmisc1:   NORM block=misc1
+zmisc1.smoothed1:   NORM block=misc1.smoothed1
+zmisc1.smoothed2:   NORM block=misc1.smoothed2
+zmisc1.smoothed3:   NORM block=misc1.smoothed3
+
+
+% --------------------------------------------------------------------------------
+% Time track
+% --------------------------------------------------------------------------------
+
+time1: TIME 
+
+% --------------------------------------------------------------------------------
+%
+% Final feature selection (blocks as defined above)
+%
+% --------------------------------------------------------------------------------
+
+SELECT spec1.svd  spec1.svd.smoothed1 spec1.svd.smoothed2 spec1.svd.smoothed3
+SELECT spec2.svd  spec2.svd.smoothed1 spec2.svd.smoothed2 spec2.svd.smoothed3
+
+SELECT rspec1.svd  rspec1.svd.smoothed1 rspec1.svd.smoothed2 rspec1.svd.smoothed3
+SELECT rspec2.svd  rspec2.svd.smoothed1 rspec2.svd.smoothed2 rspec2.svd.smoothed3
+
+SELECT  misc1      misc1.smoothed1     misc1.smoothed2     misc1.smoothed3
+SELECT zmisc1     zmisc1.smoothed1    zmisc1.smoothed2    zmisc1.smoothed3
+
+SELECT time1

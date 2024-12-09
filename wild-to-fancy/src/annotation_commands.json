@@ -1,0 +1,202 @@
+{
+    "datasets": [
+        {
+            "name": "abc",
+            "command_template": [
+                "python", "/app/wild-to-fancy/wtfancy/bin/wtf.py", "extract_hypno",
+                "--file_regex", "{file_regex}",
+                "--out_dir", "{out_dir}",
+                "--dir_name", " -nsrr.xml",
+                "--fill_blanks", "UNKNOWN",
+                "--seed", "123", "--overwrite"
+            ]
+        },
+        {
+            "name": "apoe",
+            "command_template": [
+                "python", "/app/wild-to-fancy/wtfancy/bin/wtf.py", "extract_hypno",
+                "--file_regex", "{file_regex}",
+                "--out_dir", "{out_dir}",
+                "--dir_name", " .STA",
+                "--fill_blanks", "UNKNOWN",
+                "--seed", "123", "--overwrite"
+            ]
+        },
+        {
+            "name": "apples",
+            "command_template": [
+                "python", "/app/wild-to-fancy/wtfancy/bin/wtf.py", "extract_hypno",
+                "--file_regex", "{file_regex}",
+                "--out_dir", "{out_dir}",
+                "--dir_name", " .annot",
+                "--fill_blanks", "UNKNOWN",
+                "--seed", "123", "--overwrite"
+            ]
+        },
+        {
+            "name": "ccshs",
+            "command_template": [
+                "python", "/app/wild-to-fancy/wtfancy/bin/wtf.py", "extract_hypno",
+                "--file_regex", "{file_regex}",
+                "--out_dir", "{out_dir}",
+                "--dir_name", " -nsrr.xml",
+                "--fill_blanks", "UNKNOWN",
+                "--seed", "123", "--overwrite"
+            ]
+        },
+        {
+            "name": "cfs",
+            "command_template": [
+                "python", "/app/wild-to-fancy/wtfancy/bin/wtf.py", "extract_hypno",
+                "--file_regex", "{file_regex}",
+                "--out_dir", "{out_dir}",
+                "--dir_name", " -nsrr.xml",
+                "--fill_blanks", "UNKNOWN",
+                "--seed", "123", "--overwrite"
+            ]
+        },
+        {
+            "name": "chat",
+            "command_template": [
+                "python", "/app/wild-to-fancy/wtfancy/bin/wtf.py", "extract_hypno",
+                "--file_regex", "{file_regex}",
+                "--out_dir", "{out_dir}",
+                "--dir_name", " -nsrr.xml",
+                "--fill_blanks", "UNKNOWN",
+                "--seed", "123", "--overwrite"
+            ]
+        },
+        {
+            "name": "homepap",
+            "command_template": [
+                "python", "/app/wild-to-fancy/wtfancy/bin/wtf.py", "extract_hypno",
+                "--file_regex", "{file_regex}",
+                "--out_dir", "{out_dir}",
+                "--dir_name", " -nsrr.xml",
+                "--fill_blanks", "UNKNOWN",
+                "--seed", "123", "--overwrite"
+            ]
+        },
+        {
+            "name": "mesa",
+            "command_template": [
+                "python", "/app/wild-to-fancy/wtfancy/bin/wtf.py", "extract_hypno",
+                "--file_regex", "{file_regex}",
+                "--out_dir", "{out_dir}",
+                "--dir_name", " -nsrr.xml",
+                "--fill_blanks", "UNKNOWN",
+                "--seed", "123", "--overwrite"
+            ]
+        },
+        {
+            "name": "mnc_cnc",
+            "command_template": [
+                "python", "/app/wild-to-fancy/wtfancy/bin/wtf.py", "extract_hypno",
+                "--file_regex", "{file_regex}",
+                "--out_dir", "{out_dir}",
+                "--dir_name", " -nsrr.xml",
+                "--fill_blanks", "UNKNOWN",
+                "--seed", "123", "--overwrite"
+            ]
+        },
+        {
+            "name": "mnc_dhc",
+            "command_template": [
+                "python", "/app/wild-to-fancy/wtfancy/bin/wtf.py", "extract_hypno",
+                "--file_regex", "{file_regex}",
+                "--out_dir", "{out_dir}",
+                "--dir_name", " -nsrr.xml",
+                "--fill_blanks", "UNKNOWN",
+                "--seed", "123", "--overwrite"
+            ]
+        },
+        {
+            "name": "mnc_ssc",
+            "command_template": [
+                "python", "/app/wild-to-fancy/wtfancy/bin/wtf.py", "extract_hypno",
+                "--file_regex", "{file_regex}",
+                "--out_dir", "{out_dir}",
+                "--dir_name", " -nsrr.xml",
+                "--fill_blanks", "UNKNOWN",
+                "--seed", "123", "--overwrite"
+            ]
+        },
+        {
+            "name": "mros",
+            "command_template": [
+                "python", "/app/wild-to-fancy/wtfancy/bin/wtf.py", "extract_hypno",
+                "--file_regex", "{file_regex}",
+                "--out_dir", "{out_dir}",
+                "--dir_name", " -nsrr.xml",
+                "--fill_blanks", "UNKNOWN",
+                "--seed", "123", "--overwrite"
+            ]
+        },
+        {
+            "name": "msp",
+            "command_template": [
+                "python", "/app/wild-to-fancy/wtfancy/bin/wtf.py", "extract_hypno",
+                "--file_regex", "{file_regex}",
+                "--out_dir", "{out_dir}",
+                "--dir_name", " .annot",
+                "--fill_blanks", "UNKNOWN",
+                "--seed", "123", "--overwrite"
+            ]
+        },
+        {
+            "name": "nchsdb",
+            "command_template": [
+                "python", "/app/wild-to-fancy/wtfancy/bin/wtf.py", "extract_hypno",
+                "--file_regex", "{file_regex}",
+                "--out_dir", "{out_dir}",
+                "--dir_name", " .tsv",
+                "--fill_blanks", "UNKNOWN",
+                "--seed", "123", "--overwrite"
+            ]
+        },
+        {
+            "name": "shhs",
+            "command_template": [
+                "python", "/app/wild-to-fancy/wtfancy/bin/wtf.py", "extract_hypno",
+                "--file_regex", "{file_regex}",
+                "--out_dir", "{out_dir}",
+                "--dir_name", " -nsrr.xml",
+                "--fill_blanks", "UNKNOWN",
+                "--seed", "123", "--overwrite"
+            ]
+        },
+        {
+            "name": "sof",
+            "command_template": [
+                "python", "/app/wild-to-fancy/wtfancy/bin/wtf.py", "extract_hypno",
+                "--file_regex", "{file_regex}",
+                "--out_dir", "{out_dir}",
+                "--dir_name", " -nsrr.xml",
+                "--fill_blanks", "UNKNOWN",
+                "--seed", "123", "--overwrite"
+            ]
+        },
+        {
+            "name": "wsc_stages",
+            "command_template": [
+                "python", "/app/wild-to-fancy/wtfancy/bin/wtf.py", "extract_hypno",
+                "--file_regex", "{file_regex}",
+                "--out_dir", "{out_dir}",
+                "--dir_name", " -nsrr.stg.txt",
+                "--fill_blanks", "UNKNOWN",
+                "--seed", "123", "--overwrite"
+            ]
+        },
+        {
+            "name": "wsc_score",
+            "command_template": [
+                "python", "/app/wild-to-fancy/wtfancy/bin/wtf.py", "extract_hypno",
+                "--file_regex", "{file_regex}",
+                "--out_dir", "{out_dir}",
+                "--dir_name", " -nsrr.allscore.txt",
+                "--fill_blanks", "UNKNOWN",
+                "--seed", "123", "--overwrite"
+            ]
+        }
+    ]
+}

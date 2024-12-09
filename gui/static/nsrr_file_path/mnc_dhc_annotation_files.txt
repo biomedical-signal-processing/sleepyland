@@ -1,0 +1,3 @@
+./extract_nsrr_files_path.sh
+./mnc_dhc_edf_files.txt
+./mnc_dhc_annotation_files.txt

@@ -1,0 +1,140 @@
+# Components prefixed CB are for keras callback hyperparamer settings
+
+CB_tb: &TB
+  # tensorboard
+  nickname: "tb"
+  class_name: "TensorBoard"
+  kwargs: {log_dir: './tensorboard', profile_batch: 0}
+
+CB_es: &ES
+  # Early stopping
+  nickname: "es"
+  class_name: "EarlyStopping"
+  kwargs: {monitor: 'val_dice', min_delta: 0,
+           patience: 200, verbose: 1 , mode: 'max'}
+
+CB_lrs: &LRS
+  # Learning Rate Scheduler
+  nickname: "lrs"
+  class_name: "ReduceLROnPlateau"
+  kwargs: {monitor: 'val_dice', factor: 0.5,
+           patience: 50, verbose: 1 , mode: 'max'}
+
+CB_mcp: &MCP
+  # Model checkpoint
+  nickname: "mcp"
+  class_name: "ModelCheckpoint"
+  kwargs: {filepath: "./model/@epoch_{epoch:02d}_val_dice_{val_dice:.5f}.h5",
+           monitor: "val_dice", save_best_only: false, save_weights_only: true,
+           verbose: 1, mode: "max"}
+
+CB_timer: &TIMER
+  # Train timer callback
+  nickname: "timer"
+  class_name: "TrainTimer"
+  pass_logger: True
+  kwargs: {verbose: True}
+
+CB_csv: &CSV
+  # keras.CSVLogger
+  nickname: "csv"
+  class_name: "CSVLogger"
+  kwargs: {filename: "./logs/training.csv", separator: ",", append: true}
+
+datasets:
+  # Add dataset IDs --> relative paths here
+
+  #### Training datasets
+
+  # NSRR Data (up to 2022)
+  abc: dataset_configurations/abc.yaml
+  ccshs: dataset_configurations/ccshs.yaml
+  cfs: dataset_configurations/cfs.yaml
+  chat: dataset_configurations/chat.yaml
+  homepap: dataset_configurations/homepap.yaml
+  mesa: dataset_configurations/mesa.yaml
+  mros: dataset_configurations/mros.yaml
+  shhs: dataset_configurations/shhs.yaml
+  sof: dataset_configurations/sof.yaml
+
+  # NSRR Data (to date)
+  apoe: dataset_configurations/apoe.yaml
+  apples: dataset_configurations/apples.yaml
+  mnc_cnc: dataset_configurations/mnc_cnc.yaml
+  mnc_dhc: dataset_configurations/mnc_dhc.yaml
+  mnc_ssc: dataset_configurations/mnc_ssc.yaml
+  msp: dataset_configurations/msp.yaml
+  nchsdb: dataset_configurations/nchsdb.yaml
+  wsc: dataset_configurations/wsc.yaml
+
+  #  # Open Access Data
+  #  dcsm: dataset_configurations/dcsm.yaml
+  #  sedf_sc: dataset_configurations/sedf_sc.yaml
+  #  sedf_st: dataset_configurations/sedf_st.yaml
+  #  phys: dataset_configurations/phys.yaml
+
+  #### Testing datasets
+
+  #  # NSRR Data
+  #  stages: dataset_configurations/stages.yaml
+
+  #  Inselspital Data
+  #  bsdb: dataset_configurations/stages.yaml
+build:
+  #
+  # Hyperparameters passed to the Model.build and __init__ methods
+  #
+  model_class_name: "DeepResNet"
+  filter_base: 4
+  kernel_size: 3
+  max_pooling: 2
+  num_blocks: 7
+  rnn_bidirectional: true
+  rnn_num_layers: 1
+  rnn_num_units: 1024
+  n_classes: 5
+  sec_per_prediction: 30
+  batch_shape: [64, 35, 3840, 1]
+
+augmenters:
+  # On-the-fly augmentation
+  [
+  {cls_name: "RegionalErase",
+   kwargs: {min_region_fraction: 0.001,
+            max_region_fraction: 0.33,
+            log_sample: True,
+            apply_prob: 0.1}}
+  ]
+
+fit:
+  # Hyperparameters passed to the Trainer object
+  balanced_sampling: True
+  use_multiprocessing: False
+  channel_mixture: False
+  margin: 17
+
+  # Loss function(s)
+  loss: ["SparseCategoricalCrossentropy"]
+  # reduction: "sum_over_batch_size"
+  # loss_kwargs:  # OBS: passed to all losses
+  #   name: my_loss
+
+  # Metric function(s)
+  metrics: ["SparseCategoricalAccuracy"]
+  # metric_kwargs:  # OBS: passed to all metrics
+  #   name: my_metric
+
+  # Ignore 'out-of-bounds' classes in loss computation (e.g. to ignore 'UNKNOWN'/'MOVEMENT' other rare classes)
+  # Comment out or set to Null/False to not ignore any classes
+  ignore_out_of_bounds_classes: True
+
+  # Optimization
+  batch_size: 64
+  n_epochs: 10000
+  verbose: true
+  optimizer: "Adam"
+  optimizer_kwargs: {learning_rate: 1.0e-05, amsgrad: True, weight_decay: 0.0, beta_1: 0.9,
+                     beta_2: 0.999, epsilon: 1.0e-8}
+
+  # Callbacks
+  callbacks: [*TB, *MCP, *TIMER, *CSV, *ES, *LRS]

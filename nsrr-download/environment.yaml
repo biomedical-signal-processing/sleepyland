@@ -1,0 +1,6 @@
+name: nsrr-download
+channels:
+  - defaults
+dependencies:
+  - python
+  - pip
