@@ -79,9 +79,7 @@ To get started, choose your operating system below. Just follow the step-by-step
 > If you are running the **SLEEPYLAND** software, please be aware that the application attempts to pull/install external software dependencies during its setup process. 
 > 
 > **Important Notice:**
-> If you are operating on an institutional machine (e.g., hospital or university systems), this process is likely to fail due to permission restrictions.
-
-To avoid this issue, ensure you have the necessary administrative permissions or consult your IT department before proceeding with the installation.
+> If you are operating on an institutional machine (e.g., hospital or university systems), this process is likely to fail due to permission restrictions. To avoid this issue, ensure you have the necessary administrative permissions or consult your IT department before proceeding with the installation.
 ---
 
 ## Key Features
