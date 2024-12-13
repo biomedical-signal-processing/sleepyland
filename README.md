@@ -7,7 +7,7 @@
 
 ---
 
-<div align="center">A Toolbox for Sleep Data Analysis and Sleep Stage Classification</div>
+<div align="center">A toolbox to fairly evaluate automatic sleep staging algorithms</div>
 
 ---
 
