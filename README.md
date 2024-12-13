@@ -2,7 +2,7 @@
 ---
 
 <div align="center">
-  <img src="./resources/imgs/sleepyland-logo-white.png" alt="SLEEPYLAND Logo" style="width: 300px; height: auto;">
+  <img src="./resources/imgs/sleepyland_logo_white.png" alt="SLEEPYLAND Logo" style="width: 300px; height: auto;">
 </div>
 
 ---
