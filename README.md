@@ -70,7 +70,7 @@ To get started, choose your operating system below. Just follow the step-by-step
 > SLEEPYLAND runs in the background, even if you close the web window.  
 > To completely stop the application, execute the following command in the terminal from the folder containing `docker-compose.yml`:
 > ```bash
-> docker-compose down
+> docker compose -f docker-compose.yml -p sleepyland stop
 > ```
 > *In the future, we will add a feature to close the app directly from the web UI.*
 
