@@ -5,8 +5,8 @@ install_docker() {
     echo "[INFO] Docker not found. Attempting to install Docker..."
 
     # Download Docker Desktop for Mac using curl and open the downloaded file
-    curl -L -o ~/Downloads/Docker.dmg https://desktop.docker.com/mac/stable/arm64/Docker.dmg
-        
+    curl -o ~/Downloads/Docker.dmg https://desktop.docker.com/mac/stable/Docker.dmg
+
     # Mount the DMG
     hdiutil attach ~/Downloads/Docker.dmg
 

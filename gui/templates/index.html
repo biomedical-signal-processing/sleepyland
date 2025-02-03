@@ -199,21 +199,12 @@
                                     <div id="uploader-container" style="display: none !important">
                                         <div class="row mb-3 align-items-center">
                                             <div class="col-md-12">
-                                                <label for="files" class="form-label font-weight-bold">Select a
-                                                    folder:</label>
-                                                <input type="file" class="form-control" id="files" name="files"
-                                                       webkitdirectory
-                                                       directory multiple>
-                                                <div id="folderCount" style="font-weight: bold;"></div>
-                                            </div>
-                                        </div>
-                                        <div class="row mb-3 align-items-center">
-                                            <div class="col-md-12">
                                                 <label for="dataset-select" class="form-label font-weight-bold">Select
                                                     NSRR
                                                     Dataset:</label>
                                                 <select class="form-select" id="dataset-select" name="dataset-select">
-                                                    <option value="abc" selected>abc</option>
+                                                    <option value="learn" selected>learn</option>
+                                                    <option value="abc">abc</option>
                                                     <option value="apoe">apoe</option>
                                                     <option value="apples">apples</option>
                                                     <option value="ccshs">ccshs</option>
@@ -231,6 +222,17 @@
                                                     <option value="wsc">wsc</option>
                                                 </select>
                                             </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-3 align-items-center">
+                                        <div class="col-md-12">
+                                            <label id="files-label" for="files" class="form-label font-weight-bold">Select a
+                                                folder:</label>
+                                            <input type="file" class="form-control" id="files" name="files"
+                                                   webkitdirectory
+                                                   directory multiple>
+                                            <div id="folderCount" style="font-weight: bold;"></div>
                                         </div>
                                     </div>
 
@@ -496,7 +498,13 @@
                                                                        id="ensemble"
                                                                        name="ensemble">
                                                                 <label class="form-check-label"
-                                                                       for="ensemble">Unweighted arithmetic mean</label>
+                                                                       for="ensemble">AFR</label>
+                                                                <a href="https://deslib.readthedocs.io/en/latest/modules/util/aggregation.html"
+                                                                   target="_blank"
+                                                                   class="ms-2" title="Average Fusion Rule"
+                                                                   style="color: white; text-decoration: none;">
+                                                                    <i class="bi bi-info-circle"></i>
+                                                                </a>
                                                             </div>
                                                             <div class="form-check">
                                                             </div>

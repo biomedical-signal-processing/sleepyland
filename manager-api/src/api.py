@@ -62,8 +62,8 @@ async def handle_prediction_response(response):
     return JSONResponse(content=metrics, status_code=200)
 
 
-async def perform_prediction(folder_root_name, folder_name, eeg_channels, eog_channels, emg_channels, dataset, models):
-    """Performs prediction using the predict_service and handles exceptions."""
+async def perform_evaluation(folder_root_name, folder_name, eeg_channels, eog_channels, emg_channels, dataset, models):
+    """Performs evaluation using the predict_service and handles exceptions."""
     try:
         response = predict_service(folder_root_name, folder_name, eeg_channels, eog_channels, emg_channels, dataset,
                                    models)
@@ -83,12 +83,12 @@ async def perform_prediction_one(folder_root_name, folder_name, channels, models
         return JSONResponse(content={"error": f"An error occurred in api.py: {e}"}, status_code=500)
 
 
-@app.post("/predict")
-async def predict(folder_root_name: str = Form(...), folder_name: str = Form(...),
+@app.post("/evaluate")
+async def evaluate(folder_root_name: str = Form(...), folder_name: str = Form(...),
                   eeg_channels: list[str] = Form(...), eog_channels: list[str] = Form(...),
                   emg_channels: list[str] = Form(...), dataset: str = Form(...),
                   models: list[str] = Form(...)):
-    return await perform_prediction(folder_root_name, folder_name, eeg_channels, eog_channels, emg_channels, dataset,
+    return await perform_evaluation(folder_root_name, folder_name, eeg_channels, eog_channels, emg_channels, dataset,
                                     models)
 
 
@@ -99,15 +99,15 @@ async def predict(folder_root_name: str = Form(...), folder_name: str = Form(...
                                         models)
 
 
-@app.post("/auto_predict")
-async def auto_predict(folder_root_name: str = Form(...), folder_name: str = Form(...),
+@app.post("/auto_evaluate")
+async def auto_evaluate(folder_root_name: str = Form(...), folder_name: str = Form(...),
                        eeg_channels: list[str] = Form(...), eog_channels: list[str] = Form(...),
                        emg_channels: list[str] = Form(...), dataset: str = Form(...),
                        models: list[str] = Form(...)):
     try:
         harmonization_done = harmonize_service(dataset)
         actual_folder_root_name = dataset if harmonization_done else folder_root_name
-        return await perform_prediction(actual_folder_root_name, folder_name, eeg_channels, eog_channels, emg_channels,
+        return await perform_evaluation(actual_folder_root_name, folder_name, eeg_channels, eog_channels, emg_channels,
                                         dataset, models)
     except Exception as e:
         logger.error(f"An error occurred: {str(e)}")

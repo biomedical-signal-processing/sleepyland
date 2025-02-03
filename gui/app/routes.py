@@ -1,5 +1,5 @@
 from flask import Blueprint, request, render_template, send_file
-from app.services.prediction_service import send_to_prediction_service, handle_download_block, sent_to_prediction_one_service
+from app.services.prediction_service import send_to_evaluation_service, handle_download_block, sent_to_prediction_one_service
 from app.services.download_service import send_to_download_service
 from app.services.graph_service import create_hypnogram, create_hypnodensity_graph
 from app.services.metrics_service import compute_metrics
@@ -8,7 +8,9 @@ from app.utils.file_validation import validate_files
 from app.utils.file_handling import clear_directory, save_uploaded_files, save_edf_file
 from app.utils.logging_config import configure_logging
 from flask import jsonify
+import pandas as pd
 import os
+import shutil
 
 log = configure_logging()
 
@@ -40,6 +42,15 @@ def get_channels():
     dataset_selected = request.json.get('dataset-select')
     channels = get_channels_from_hparam(dataset_selected)
     return jsonify(channels), 200
+
+@bp.route('/get_reference_metrics', methods=['POST'])
+def get_reference_metrics():
+    model = request.json.get("model")
+    metrics_df = pd.read_csv("utils/all_models_metrics.csv", index_col=[0, 1])
+    means = metrics_df.xs("mean", level=1).loc[:, [col for col in metrics_df.columns if "Global" in col or "F1" in col]].loc[model,:]
+    stds = metrics_df.xs("std", level=1).loc[:,[col for col in metrics_df.columns if "Global" in col or "F1" in col]].loc[model,:]
+
+    return jsonify({"means": means.to_dict(), "stds": stds.to_dict()}), 200
 
 
 @bp.route('/download_data', methods=['POST'])
@@ -114,12 +125,32 @@ def process():
             response = handle_download_block(download_dataset, folder_name, eeg_channels, eog_channels, emg_channels,
                                              models_selected)
         else:
-            is_valid, error_response, status_code = validate_files(files)
-            if not is_valid:
-                return jsonify(error_response), status_code
 
-            folder_root_name = save_uploaded_files(files)
-            response = send_to_prediction_service(folder_root_name, folder_name, eeg_channels, eog_channels,
+            if dataset == "learn":
+                source_folder = "/app/learn_edfs"
+
+                destination_folder = "/app/input/learn"
+
+                if not os.path.exists(destination_folder):
+                    os.makedirs(destination_folder)
+
+                for file_name in os.listdir(source_folder):
+                    source_file = os.path.join(source_folder, file_name)
+                    destination_file = os.path.join(destination_folder, file_name)
+
+                    if os.path.isfile(source_file):
+                        shutil.copy2(source_file, destination_file)
+
+                folder_root_name = "learn"
+
+            else:
+                is_valid, error_response, status_code = validate_files(files)
+                if not is_valid:
+                    return jsonify(error_response), status_code
+
+                folder_root_name = save_uploaded_files(files)
+
+            response = send_to_evaluation_service(folder_root_name, folder_name, eeg_channels, eog_channels,
                                                   emg_channels,
                                                   dataset, models_selected)
 

@@ -51,6 +51,7 @@ COPY requirements.txt .
 # Create a new conda environment named u-sleepyland-tfcuda using the environment.yaml file.
 RUN conda env create -f environment.yaml
 
+# Install additional packages required for the FastAPI application.
 RUN apt-get update && apt-get install -y gcc g++ make libgomp1 && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
@@ -61,6 +62,7 @@ RUN /bin/bash -c "source activate u-sleepyland-tfcuda && \
     pip install fastapi==0.95.0 pydantic==1.10.2 typing_extensions>=4.0.0 uvicorn pyyaml && \
     pip install -r requirements.txt"
 
+# Set the LD_PRELOAD environment variable to the path of the libgomp shared library.
 ENV LD_PRELOAD=/opt/conda/envs/u-sleepyland-tfcuda/lib/libgomp.so.1
 
 # Expose port 7777 on the container for the FastAPI application.

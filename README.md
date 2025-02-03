@@ -24,13 +24,17 @@ To get started, choose your operating system below. Just follow the step-by-step
 |                                                                   **Linux**                                                                    |                                                                   **Mac**                                                                    |                                                                   **Windows**                                                                    |
 |:----------------------------------------------------------------------------------------------------------------------------------------------:|:--------------------------------------------------------------------------------------------------------------------------------------------:|:------------------------------------------------------------------------------------------------------------------------------------------------:|
 | <img src="https://raw.githubusercontent.com/EgoistDeveloper/operating-system-logos/master/src/64x64/LIN.png" alt="Linux" style="width: 40px;"> | <img src="https://raw.githubusercontent.com/EgoistDeveloper/operating-system-logos/master/src/64x64/MAC.png" alt="Mac" style="width: 40px;"> | <img src="https://raw.githubusercontent.com/EgoistDeveloper/operating-system-logos/master/src/64x64/WIN.png" alt="Windows" style="width: 40px;"> |
-|                                           **Step 1**: [Download](./linux_setup.sh) `linux_setup.sh`                                            |                                          **Step 1**: [Download](./macos_setup.sh) `macos_setup.sh`                                           |                                             **Step 1**: [Download](./win_setup.ps1) `win_setup.ps1`                                              |
-|                                       **Step 2**: [Download `docker-compose.yml`](./docker-compose.yml)                                        |                                      **Step 2**: [Download `docker-compose.yml`](./docker-compose.yml)                                       |                                        **Step 2**: [Download `docker-compose.yml`](./docker-compose.yml)                                         |
+|                                           **Step 1**: [Download](./linux_setup.sh) `linux_setup.sh`                                            |                                          **Step 1**: [Download](./macos_setup.sh) `macos_setup.sh`                                           |                                             **Step 1**: [Download](../../Downloads/win_setup.ps1) `win_setup.ps1`                                              |
+|                                       **Step 2**: [Download `docker-compose.yml`](../../Downloads/docker-compose.yml)                                        |                                      **Step 2**: [Download `docker-compose.yml`](../../Downloads/docker-compose.yml)                                       |                                        **Step 2**: [Download `docker-compose.yml`](../../Downloads/docker-compose.yml)                                         |
 |                                          **Step 3**: Place the `.sh`/`.yml` files in the same folder.                                          |                                         **Step 3**: Place the `.sh`/`.yml` files in the same folder.                                         |                                          **Step 3**: Place the `.ps1`/`.yml` files in the same folder.                                           |
 |                                         **Step 4**: Open a terminal, navigate to the folder, and run:                                          |                                        **Step 4**: Open a terminal, navigate to the folder, and run:                                         |                                  **Step 4**: Open PowerShell as Administrator, navigate to the folder, and run:                                  |
 |                                                 `chmod +x linux_setup.sh && ./linux_setup.sh`                                                  |                                                `chmod +x macos_setup.sh && ./macos_setup.sh`                                                 |                                                                `./win_setup.ps1`                                                                 |
 
 </div>
+
+> ❗GOOD TO KNOW❗
+> 
+> Running `.sh` and `.ps1` scripts will also update SLEEPYLAND, automatically pulling the latest version of the shared Docker images.
     
 >❗WARNING❗
 > 
@@ -44,6 +48,14 @@ To get started, choose your operating system below. Just follow the step-by-step
 > docker --version
 > ```
 > If the command returns the Docker version, you are ready to proceed from the step 1.
+
+> **Windows Users:**
+>
+> If you encounter issues running the `.ps1` script, you may need to change the PowerShell execution policy. To do this, open PowerShell as Administrator and run:
+> ```powershell
+> Set-ExecutionPolicy Unrestricted
+> ```
+> Confirm the change if prompted. This will allow the script to execute properly.
 
 >❗WARNING❗
 > 

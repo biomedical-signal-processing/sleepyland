@@ -1,6 +1,17 @@
 {
     "datasets": [
         {
+            "name": "learn",
+            "command_template": [
+                "python", "/app/wild-to-fancy/wtfancy/bin/wtf.py", "extract_hypno",
+                "--file_regex", "{file_regex}",
+                "--out_dir", "{out_dir}",
+                "--dir_name", " .xml",
+                "--fill_blanks", "UNKNOWN",
+                "--seed", "123", "--overwrite"
+            ]
+        },
+        {
             "name": "abc",
             "command_template": [
                 "python", "/app/wild-to-fancy/wtfancy/bin/wtf.py", "extract_hypno",

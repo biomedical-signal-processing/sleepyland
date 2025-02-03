@@ -2,38 +2,22 @@ let isDarkMode = false; // Flag to determine if dark mode is enabled
 let currentSlide = 0; // Index of the current slide
 let totalSlides = 0; // Total number of slides
 
-
-const readCsv = async () => {
-    fetch('../static/performances/models_performances.csv')
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-            return response.text();
-        })
-        .then(csvData => {
-            // Parse CSV data using Papa Parse
-            Papa.parse(csvData, {
-                header: true, // Treat the first row as headers
-                skipEmptyLines: true, // Skip empty lines
-                complete: function (results) {
-                    //console.log("Parsed Data:", results.data);
-
-                },
-                error: function (error) {
-                    console.error("Error parsing CSV:", error);
-                }
-            });
-        })
-        .catch(error => {
-            console.error("Error fetching CSV:", error);
-        });
-}
-
 // Initialize theme and UI settings after DOM is fully loaded
 document.addEventListener('DOMContentLoaded', async () => {
     const datasetSelect = document.getElementById('dataset-select');
-    await readCsv();
+    const filesInput = document.getElementById('files');
+    const filesLabel = document.getElementById('files-label');
+
+
+    if (datasetSelect && filesInput) {
+        filesInput.style.display = datasetSelect.value === 'learn' ? 'none' : 'block';
+        filesLabel.style.display = datasetSelect.value === 'learn' ? 'none' : 'block';
+        datasetSelect.addEventListener('change', function () {
+            filesInput.style.display = this.value === 'learn' ? 'none' : 'block';
+            filesLabel.style.display = this.value === 'learn' ? 'none' : 'block';
+        });
+    }
+
     // Button groups by style
     const buttonGroups = {
         primary: [
@@ -72,7 +56,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     document.getElementById('dropdownMenuButtonEEG').style.backgroundColor = isDarkMode ? '#222529' : '#ffffff';
     document.getElementById('dropdownMenuButtonEOG').style.backgroundColor = isDarkMode ? '#222529' : '#ffffff';
-
     // Adjust logo and theme based on mode
     document.getElementById('logo').src = isDarkMode
         ? '../static/images/sleepyland_logo_dark.png'
@@ -93,13 +76,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     updateProprietaryChannelsButton();
 
     // Populate channels if dataset is pre-selected
-    if (datasetSelect.value === 'abc') {
-        await fetchAndPopulateChannels('abc');
+    if (datasetSelect.value === 'learn') {
+        await fetchAndPopulateChannels('learn');
     }
 
     // Update channels menu on dataset selection change
     datasetSelect.addEventListener('change', async () => {
         clearChannelMenus();
+        if (datasetSelect.value === 'learn') {
+            removeRequiredAttribute('files');
+        }else {
+            addRequiredAttribute('files');
+        }
         await fetchAndPopulateChannels(datasetSelect.value);
     });
 });
@@ -179,6 +167,8 @@ const clearChannelMenus = () => {
     // ['eegChannelMenu', 'eogChannelMenu', 'emgChannelMenu'].forEach(id => {
     //     document.getElementById(id).innerHTML = '';
     // });
+    document.getElementById('dropdownMenuButtonEEG').textContent = 'All channels';
+    document.getElementById('dropdownMenuButtonEOG').textContent = 'All channels';
     ['eegChannelMenu', 'eogChannelMenu'].forEach(id => {
         document.getElementById(id).innerHTML = '';
     });
@@ -353,7 +343,6 @@ document.getElementById('nsrrButton').addEventListener('click', () => {
 // Event listener to display upload related containers
 document.getElementById('uploadButton').addEventListener('click', () => {
     toggleUploadContainerVisibility(true);
-    addRequiredAttribute('files');
     addRequiredAttribute('folderName');
     document.getElementById('transformer').disabled = false;
     document.getElementById('deepresnet').disabled = false;
@@ -417,8 +406,6 @@ const resetUploadForm = () => {
     document.getElementById('folderName').value = '';
     document.getElementById('files').value = '';
     document.getElementById('nsrrToken').required = false;
-    document.getElementById('files').required = true; // Ensure files are required
-    document.getElementById('files').disabled = false; // Enable the files field
     // disableElements(['nsrrToken']); // Disable the token and files elements initially
 }
 
@@ -589,8 +576,21 @@ async function sendRequest() {
             const response = await fetch('/process', {method: 'POST', body: formData});
             const data = await response.json();
 
+            let singleChannelEEG = false;
+            let singleChannelEOG = false;
+
+            ['eeg', 'eog'].forEach(type => {
+                if (getSelectedChannels(type).length === 0) {
+                    if (type === 'eeg') {
+                        singleChannelEOG = true;
+                    } else {
+                        singleChannelEEG = true;
+                    }
+                }
+            });
+
             // Handle server response
-            handleProcessingResponse(response, data, checkedAlgorithms);
+            await handleProcessingResponse(response, data, checkedAlgorithms, singleChannelEEG, singleChannelEOG);
         } catch (error) {
             // Display error message in case of request failure
             status.textContent = 'An error occurred: ' + error;
@@ -604,7 +604,7 @@ async function sendRequest() {
 }
 
 // Updates the status and triggers the slide and card generation functions based on server response
-const handleProcessingResponse = (response, data, checkedAlgorithms) => {
+const handleProcessingResponse = async (response, data, checkedAlgorithms, singleChannelEEG, singleChannelEOG) => {
     const status = document.getElementById('status');
     const statusHypno = document.getElementById('statusHypno');
     const statusPerformance = document.getElementById('statusPerformance');
@@ -614,7 +614,7 @@ const handleProcessingResponse = (response, data, checkedAlgorithms) => {
         statusPerformance.textContent = '';
 
         createCards(checkedAlgorithms);  // Display cards for selected algorithms
-        createCardsForConfMatrix(checkedAlgorithms);  // Display cards for confusion matrix
+        await createCardsForConfMatrix(checkedAlgorithms, singleChannelEEG, singleChannelEOG);  // Display cards for confusion matrix
         loadTotalSlides(false);               // Load and display total slide count
 
         if (document.getElementById('nsrrToken').disabled === true) {
@@ -715,19 +715,41 @@ const createCards = (checkedAlgorithm) => {
     });
 };
 
-const createCardsForConfMatrix = (checkedAlgorithm) => {
+const getMetricsFromCsv = async (model) => {
+     try {
+        const response = await fetch('/get_reference_metrics', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ 'model': model })
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const jsonData = await response.json();
+        console.log(jsonData);
+        return jsonData;
+    } catch (error) {
+        console.error("Error fetching CSV:", error);
+        throw error;
+    }
+}
+
+const createCardsForConfMatrix = async (checkedAlgorithm, singleChannelEEG, singleChannelEOG) => {
     const cardContainer = document.getElementById('card-container');
     const cardContainerPerformance = document.getElementById('card-container-performance');
 
 
-    const createCardForConfMatrix = (algorithm, container, type) => {
+    const createCardForConfMatrix = async (algorithm, container, type, singleChannelEEG, singleChannelEOG) => {
         const card = document.createElement('div');
         card.classList.add('card', 'm-3', 'shadow-sm', 'rounded');
 
         const cardHeader = document.createElement('div');
         cardHeader.classList.add('card-header', 'text-center', 'd-flex', 'justify-content-between', 'align-items-center');
 
-        // Create text span and arrow icon for the header
         const headerText = document.createElement('span');
 
         if (algorithm.toLowerCase() === 'yasa') {
@@ -746,11 +768,9 @@ const createCardsForConfMatrix = (checkedAlgorithm) => {
         arrowIcon.classList.add('arrow-icon');
         arrowIcon.textContent = '▲';
 
-        // Append text and icon to the header
         cardHeader.appendChild(headerText);
         cardHeader.appendChild(arrowIcon);
 
-        // Toggle display of card body on click
         cardHeader.addEventListener('click', () => {
             const cardBody = card.querySelector('.card-body');
             cardBody.style.display = cardBody.style.display === 'none' ? '' : 'none';
@@ -768,7 +788,7 @@ const createCardsForConfMatrix = (checkedAlgorithm) => {
         titleRow.style.cssText = 'width: 100%; margin:0; padding: 0;';
 
         const titleColumn = document.createElement('div');
-        titleColumn.classList.add('col-12', 'border', 'rounded'); // Full width column
+        titleColumn.classList.add('col-12', 'border', 'rounded');
 
         if (isDarkMode)
             titleColumn.style.cssText = 'height: 50px; display: flex; align-items: center; justify-content: left; background-color: #272a2e; color: white;';
@@ -777,31 +797,31 @@ const createCardsForConfMatrix = (checkedAlgorithm) => {
 
         const title = document.createElement('h6');
         title.style.cssText = 'margin: 5px;';
-        title.classList.add('text-center'); // Center align the title
+        title.classList.add('text-center');
         title.id = `title-${algorithm}`;
 
         titleColumn.appendChild(title);
         titleRow.appendChild(titleColumn);
-        cardBody.appendChild(titleRow); // Add the title row to the cardBody
+        cardBody.appendChild(titleRow);
 
         const dataRow = document.createElement('div');
         dataRow.classList.add('row', 'mb-3'); // Margin-bottom for spacing
         dataRow.style.cssText = 'height: 400px; width: 100%; margin: 0; display: flex; justify-content: space-between; align-items: stretch; padding: 0;';
 
         const metricsColumn = document.createElement('div');
-        metricsColumn.classList.add('col-12', 'col-md-4', 'border', 'rounded'); // Full width column
+        metricsColumn.classList.add('col-12', 'col-md-4', 'border', 'rounded');
         if (isDarkMode)
             metricsColumn.style.cssText = 'display: flex; justify-content: center; align-items: stretch; margin: 0; padding: 0; background-color: #272a2e;';
         else
             metricsColumn.style.cssText = 'display: flex; justify-content: center; align-items: stretch; margin: 0; padding: 0; background-color: #f7f7f7;';
         const insideMetricsRow = document.createElement('div');
-        insideMetricsRow.classList.add('row'); // Margin-bottom for spacing
+        insideMetricsRow.classList.add('row');
 
         const insidePredictionMetricsColumn = document.createElement('div');
-        insidePredictionMetricsColumn.classList.add('col-6', 'col-md-6'); // Full width column
+        insidePredictionMetricsColumn.classList.add('col-6', 'col-md-6');
 
         const insideTrueMetricsColumn = document.createElement('div');
-        insideTrueMetricsColumn.classList.add('col-6', 'col-md-6'); // Full width column
+        insideTrueMetricsColumn.classList.add('col-6', 'col-md-6');
         insideTrueMetricsColumn.style.cssText = 'border-left:1px solid #495057;';
 
         const metricsDiv = document.createElement('div');
@@ -813,17 +833,43 @@ const createCardsForConfMatrix = (checkedAlgorithm) => {
         overallMetricsDiv.id = `overall-metrics-${algorithm}`;
         overallMetricsDiv.classList.add('metrics-container');
         overallMetricsDiv.style.cssText = 'width: 100%; padding: 20px; margin-right: 20px; height: 450px;';
+
+        let metricsAlgorithm;
+
+        if (algorithm.toLowerCase() === 'deepresnet' && singleChannelEEG) {
+            metricsAlgorithm = 'DEEPRESNET_NSRR2022_EEG';
+        }else if (algorithm.toLowerCase() === 'deepresnet' && singleChannelEOG) {
+            metricsAlgorithm = 'DEEPRESNET_NSRR2022_EOG';
+        }else if (algorithm.toLowerCase() === 'deepresnet') {
+            metricsAlgorithm = 'DEEPRESNET_NSRR2022';
+        }else if (algorithm.toLowerCase() === 'transformer' && singleChannelEEG) {
+            metricsAlgorithm = 'SLEEPTRANSFORMER_NSRR2022_EEG';
+        }else if (algorithm.toLowerCase() === 'transformer' && singleChannelEOG) {
+            metricsAlgorithm = 'SLEEPTRANSFORMER_NSRR2022_EOG';
+        }else if (algorithm.toLowerCase() === 'transformer') {
+            metricsAlgorithm = 'SLEEPTRANSFORMER_NSRR2022';
+        }else if (algorithm.toLowerCase() === 'usleep' && singleChannelEEG) {
+            metricsAlgorithm = 'USLEEP_NSRR2022_EEG';
+        }else if (algorithm.toLowerCase() === 'usleep' && singleChannelEOG) {
+            metricsAlgorithm = 'USLEEP_NSRR2022_EOG';
+        }else if (algorithm.toLowerCase() === 'usleep') {
+            metricsAlgorithm = 'USLEEP_NSRR2022';
+        }else{
+            metricsAlgorithm = 'USLEEP_NSRR2022';
+        }
+        const data = await getMetricsFromCsv(metricsAlgorithm);
+
         overallMetricsDiv.innerHTML = `
             <p class="h3 text-body">References</p>
-            <p class="text-body">xx ± yy</p>
-            <p class="text-body">xx ± yy</p>
-            <p class="text-body">xx ± yy</p>
-            <p class="text-body">xx ± yy</p>
-            <p class="text-body">xx ± yy</p>
-            <p class="text-body">xx ± yy</p>
-            <p class="text-body">xx ± yy</p>
-            <p class="text-body">xx ± yy</p>
-            <p class="text-body">xx ± yy</p>
+            <p class="text-body">${parseFloat(data.means["Global Macro F1"].toFixed(2))} ± ${parseFloat(data.stds["Global Macro F1"].toFixed(2))}</p>
+            <p class="text-body">${parseFloat(data.means["F1-W"].toFixed(2))} ± ${parseFloat(data.stds["F1-W"].toFixed(2))}</p>
+            <p class="text-body">${parseFloat(data.means["F1-N1"].toFixed(2))} ± ${parseFloat(data.stds["F1-N1"].toFixed(2))}</p>
+            <p class="text-body">${parseFloat(data.means["F1-N2"].toFixed(2))} ± ${parseFloat(data.stds["F1-N2"].toFixed(2))}</p>
+            <p class="text-body">${parseFloat(data.means["F1-N3"].toFixed(2))} ± ${parseFloat(data.stds["F1-N3"].toFixed(2))}</p>
+            <p class="text-body">${parseFloat(data.means["F1-REM"].toFixed(2))} ± ${parseFloat(data.stds["F1-REM"].toFixed(2))}</p>
+            <p class="text-body">${parseFloat(data.means["Global Accuracy"].toFixed(2))} ± ${parseFloat(data.stds["Global Accuracy"].toFixed(2))}</p>
+            <p class="text-body">${parseFloat(data.means["Global Macro Recall"].toFixed(2))} ± ${parseFloat(data.stds["Global Macro Recall"].toFixed(2))}</p>
+            <p class="text-body">${parseFloat(data.means["Global Macro Precision"].toFixed(2))} ± ${parseFloat(data.stds["Global Macro Precision"].toFixed(2))}</p>
         `;
 
         insidePredictionMetricsColumn.appendChild(metricsDiv);
@@ -856,9 +902,9 @@ const createCardsForConfMatrix = (checkedAlgorithm) => {
         container.appendChild(card);
     };
 
-    checkedAlgorithm.forEach(algorithm => {
-        createCardForConfMatrix(algorithm, cardContainerPerformance, 'metrics_results');
-    });
+    for (const algorithm of checkedAlgorithm) {
+        await createCardForConfMatrix(algorithm, cardContainerPerformance, 'metrics_results', singleChannelEEG, singleChannelEOG);
+    }
 };
 
 // Function to load the total number of slides from a JSON file
@@ -925,7 +971,7 @@ const loadPerformanceData = (slideIndex) => {
 
                     metricsDiv.innerHTML = `
                     <p class="h3 text-body">Metrics</p>
-                    <p class="text-body"><strong>F1 Score:</strong> ${algorithmMetrics.Mf1_score.toFixed(2)}</p>
+                    <p class="text-body"><strong>MF1 Score:</strong> ${algorithmMetrics.Mf1_score.toFixed(2)}</p>
                     <p class="text-body"><strong>F1 Wake:</strong> ${algorithmMetrics.f1_score_wake.toFixed(2)}</p>
                     <p class="text-body"><strong>F1 N1:</strong> ${algorithmMetrics.f1_score_n1.toFixed(2)}</p>
                     <p class="text-body"><strong>F1 N2:</strong> ${algorithmMetrics.f1_score_n2.toFixed(2)}</p>

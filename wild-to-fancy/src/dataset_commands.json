@@ -1,6 +1,21 @@
 {
     "datasets": [
         {
+            "name": "learn",
+            "command_template": [
+                "python",
+                "/app/wild-to-fancy/wtfancy/bin/wtf.py",
+                "extract",
+                "--file_regex", "{file_regex}",
+                "--out_dir", "{out_dir}",
+                "--resample", "128",
+                "--channels", "EEG", "EEG(sec)", "EEG_SEC", "EEG_2", "EEG2", "EOG(L)", "EOG(R)", "EMG",
+                "--rename_channels", "C4-A1", "C3-A2", "C3-A2", "C3-A2", "C3-A2", "EOG(L)-PG1", "EOG(R)-PG1", "EMG",
+                "--seed", "123",
+                "--overwrite"
+            ]
+        },
+        {
             "name": "abc",
             "command_template": [
                 "python",
@@ -143,7 +158,7 @@
                 "--channels", "C3-M2", "C3", "C4-M1", "C4", "Cz", "F3-M2", "F3", "F4-M1", "F4", "O1-M2", "O1", "O2-M1", "O2", "E1-M2", "E1", "E2-M1", "E2", "cchin", "cchin_l", "chin",
                 "--seed", "123",
                 "--overwrite",
-                "--del_nsrr_names"
+                "--del_substring"
             ]
         },
         {
@@ -158,7 +173,7 @@
                 "--channels", "C3-M2", "C3", "C4-M1", "C4", "Cz", "F3-M2", "F3", "F4-M1", "F4", "O1-M2", "O1", "O2-M1", "O2", "E1-M2", "E1", "E2-M1", "E2", "cchin", "cchin_l", "chin",
                 "--seed", "123",
                 "--overwrite",
-                "--del_nsrr_names"
+                "--del_substring"
             ]
         },
         {
@@ -173,7 +188,7 @@
                 "--channels", "C3-M2", "C4-M1", "E1-M2", "E2-M1", "E1", "E2", "LChin", "RChin", "L Chin", "R Chin", "L_CHIN-R_CHIN",
                 "--seed", "123",
                 "--overwrite",
-                "--del_nsrr_names"
+                "--del_substring"
             ]
         },
         {
@@ -250,7 +265,7 @@
                 "--rename_channels", "F3-M1", "F3-M2", "F3-AVG", "F4-M1", "F4-M2", "F4-AVG", "Fz-M1", "Fz-M2", "Fz-AVG", "Cz-M1", "Cz-M2", "Cz-AVG", "C3-M1", "C3-M2", "C3-AVG", "C4-M1", "C4-M2", "C4-AVG", "Pz-M1", "Pz-M2", "Pz-AVG", "Pz-Cz", "O1-M1", "O1-M2", "O1-AVG", "O2-M1", "O2-M2", "O2-AVG", "E1", "E2", "chin", "cchin_l", "cchin_r", "rchin_l",
                 "--seed", "123",
                 "--overwrite",
-                "--del_nsrr_names"
+                "--del_substring"
             ]
         }
     ]

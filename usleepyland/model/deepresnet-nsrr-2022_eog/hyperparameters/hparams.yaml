@@ -56,6 +56,7 @@ datasets:
   mros: dataset_configurations/mros.yaml
   shhs: dataset_configurations/shhs.yaml
   sof: dataset_configurations/sof.yaml
+  learn: dataset_configurations/learn.yaml
 
   # NSRR Data (to date)
   apoe: dataset_configurations/apoe.yaml

@@ -19,11 +19,9 @@ def create_hypnogram(folder_name, models_selected, is_predict_one, log):
         if not is_predict_one:
             true_folder = f'/app/output/{folder_name}/{model}/TRUE_files'
 
-        majority_files = sorted(os.listdir(majority_folder))
+        majority_files = sorted([file for file in os.listdir(majority_folder) if file.endswith('.npy')])
         if not is_predict_one:
             true_files = sorted(os.listdir(true_folder))
-            assert len(majority_files) == len(
-                true_files), "Mismatch in the number of files between 'majority' and 'true' folders."
 
         total_slides = len(majority_files)
 
@@ -119,7 +117,7 @@ def create_hypnodensity_graph(folder_name, models_selected, log, is_logits=False
 
         majority_folder = f'/app/output/{folder_name}/{model}/majority'
 
-        majority_files = sorted(os.listdir(majority_folder))
+        majority_files = sorted([file for file in os.listdir(majority_folder) if file.endswith('.npy')])
 
         for i, maj_file in enumerate(majority_files):
             sleep_probabilities_majority = np.load(
@@ -130,28 +128,23 @@ def create_hypnodensity_graph(folder_name, models_selected, log, is_logits=False
 
             cumulative_probs = np.cumsum(sleep_probabilities_majority, axis=1)
 
+            colors = ['#364B9A', '#83B8D7', '#EAECCC', '#F99858', '#A50026']
+
+            # Define names for each stage
+            stage_names = ['Wake', 'N1', 'N2', 'N3', 'REM']
+
             fig = go.Figure()
+
             for j in range(cumulative_probs.shape[1]):
-
-                if j == 0:
-                    name = 'Wake'
-                elif j == 1:
-                    name = 'N1'
-                elif j == 2:
-                    name = 'N2'
-                elif j == 3:
-                    name = 'N3'
-                else:
-                    name = 'REM'
-
                 fig.add_trace(go.Scatter(
                     x=np.arange(0, len(cumulative_probs)),
                     y=cumulative_probs[:, j],
                     mode='lines',
-                    name=name,
-                    line=dict(width=2),
-                    fill='tonexty' if j == 0 else 'tonexty',
-                    fillcolor=f'rgba({(j + 1) * 50}, {(j + 1) * 30}, {(j + 1) * 150})',
+                    name=stage_names[j],
+                    line=dict(width=2, color=colors[j]),  # Set line color
+                    fill='tonexty',
+                    fillcolor=f'rgba{tuple(int(colors[j][i:i + 2], 16) for i in (1, 3, 5)) + (0.5,)}',
+                    # Convert HEX to RGBA
                     hoverinfo='none'
                 ))
             fig.update_layout(title=f"{maj_file.split('.')[0].split('_')[0]}",
@@ -162,6 +155,8 @@ def create_hypnodensity_graph(folder_name, models_selected, log, is_logits=False
                               )
 
             fig_json = fig.to_json()
+
+            log.debug(f"{fig_json}")
 
             if not os.path.exists(f"/app/static/{model}"):
                 os.makedirs(f"/app/static/{model}")
