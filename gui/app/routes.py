@@ -132,6 +132,7 @@ def process():
             if dataset == "learn":
                 source_folder = "/app/learn_edfs"
 
+                destination_folder = "/app/input/learn"
 
                 if not os.path.exists(destination_folder):
                     os.makedirs(destination_folder)

@@ -48,6 +48,8 @@ services:
     container_name: usleepyland_container
     ports:
       - "7777:7777"
+    environment:
+      - LD_PRELOAD=/opt/conda/envs/u-sleepyland-tfcuda/lib/libgomp.so.1:/opt/conda/envs/u-sleepyland-tfcuda/lib/python3.9/site-packages/sklearn/utils/../../scikit_learn.libs/libgomp-d22c30c5.so.1.0.0
     volumes:
       - ./input:/app/input
       - ./output:/app/output
