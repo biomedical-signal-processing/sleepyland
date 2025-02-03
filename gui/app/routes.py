@@ -125,9 +125,6 @@ def process():
             response = handle_download_block(download_dataset, folder_name, eeg_channels, eog_channels, emg_channels,
                                              models_selected)
         else:
-            is_valid, error_response, status_code = validate_files(files)
-            if not is_valid:
-                return jsonify(error_response), status_code
 
             if dataset == "learn":
                 source_folder = "/app/learn_edfs"
