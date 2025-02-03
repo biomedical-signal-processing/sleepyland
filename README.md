@@ -108,7 +108,7 @@ To get started, choose your operating system below. Just follow the step-by-step
 
 ---
 
-For instructions on navigating the UI and making the most of the analysis tools, check out this **[Quickstart Tutorial Video]([https://www.youtube.com/watch?v=7jpcyNbfThc&t=1s](https://supsi-my.sharepoint.com/:v:/g/personal/matteo_metaldi_supsi_ch/EW9iXTYxpoJOkOlV8-saDcsBZkSQMAh6zPMNDpo1frkDmw?nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJPbmVEcml2ZUZvckJ1c2luZXNzIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXciLCJyZWZlcnJhbFZpZXciOiJNeUZpbGVzTGlua0NvcHkifX0&e=n4sWts))**.
+For instructions on navigating the UI and making the most of the analysis tools, check out this **[Quickstart Tutorial Video]([https://supsi-my.sharepoint.com/:v:/g/personal/matteo_metaldi_supsi_ch/EW9iXTYxpoJOkOlV8-saDcsBZkSQMAh6zPMNDpo1frkDmw?nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJPbmVEcml2ZUZvckJ1c2luZXNzIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXciLCJyZWZlcnJhbFZpZXciOiJNeUZpbGVzTGlua0NvcHkifX0&e=n4sWts]))**.
 
 ---
 
