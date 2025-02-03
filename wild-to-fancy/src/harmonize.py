@@ -2,7 +2,9 @@ import json
 import os
 import shutil
 import subprocess
-from fastapi import FastAPI, UploadFile, File, HTTPException, Form
+from typing import List
+
+from fastapi import FastAPI, UploadFile, File, HTTPException, Form, Query
 
 import logging
 
@@ -91,7 +93,8 @@ async def harmonize(folder_name: str = Form(...), dataset: str = Form(...)):
     if os.path.exists(log_dir):
         shutil.rmtree(log_dir)
 
-    shutil.rmtree(extract_dir)
+    if extract_dir.split("/")[-1] != dataset:
+        shutil.rmtree(extract_dir)
 
     processed_files = os.listdir(processed_output_dir)
 
@@ -99,3 +102,30 @@ async def harmonize(folder_name: str = Form(...), dataset: str = Form(...)):
         return {"message": "Files processed successfully", "files": processed_files}
     else:
         raise HTTPException(status_code=500, detail="No processed files found.")
+
+
+@app.post("/npy-to-annot")
+def npy_to_annot(folder_path: str = Form(...), channels: str = Form(...), model: str = Form(...)):
+
+    npy_files = []
+
+    logger.debug(f"Processing files in: {folder_path}")
+
+    for file in os.listdir(folder_path):
+        logger.debug(f"Processing file: {file}")
+        if file.endswith('.npy'):
+            logger.debug(f"Found NPY file: {file}")
+            npy_files.append(file)
+
+    if not npy_files:
+        raise HTTPException(status_code=400, detail="No NPY file found.")
+
+    for npy_file in npy_files:
+
+        npy_path = os.path.join(folder_path, npy_file)
+
+        command = ["python", "/app/wild-to-fancy/wtfancy/bin/wtf.py", "npy_to_annot", "--input_files", str(folder_path + npy_file), "--out_dir", folder_path, "--channel", channels, "--model", model,"--overwrite"]
+
+        run_command(command)
+
+    return {"message": "Files processed successfully"}

@@ -149,5 +149,4 @@ def predict_one_service(folder_root_name, folder_name, channels, models):
         requests.post(ENSEMBLE_ONE_URL,
                                  data={'folder_name': folder_name, 'models': models_generated})
 
-    return {"message": "Prediction completed successfully."} if responses else {
-        "message": "Prediction failed", "metrics": []}
+    return {"message": "Prediction completed successfully."}

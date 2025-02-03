@@ -49,6 +49,7 @@ datasets:
   mros: dataset_configurations/mros.yaml
   shhs: dataset_configurations/shhs.yaml
   sof: dataset_configurations/sof.yaml
+  learn: dataset_configurations/learn.yaml
 
   # NSRR Data (to date)
   apoe: dataset_configurations/apoe.yaml
@@ -84,13 +85,13 @@ build:
   time_bins : 29
   n_channels : 1
   # epoch transformer params
-  frm_d_model : 256 # should be (freq_bins-1)*n_channels
+  frm_d_model : 128 # should be (freq_bins-1)*n_channels
   frm_num_blocks : 4
   frm_dff : 1024
   frm_num_heads : 8
   frm_maxlen : 29
   # sequence transformer params
-  seq_d_model : 256 # should be (freq_bins-1)*n_channels
+  seq_d_model : 128 # should be (freq_bins-1)*n_channels
   seq_num_blocks : 4
   seq_dff : 1024
   seq_num_heads : 8

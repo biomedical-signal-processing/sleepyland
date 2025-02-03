@@ -38,6 +38,10 @@ COPY ./templates /app/templates
 # This directory contains static files like CSS, JavaScript, and images used by the Flask application.
 COPY ./static /app/static
 
+# Copy the learn_edfs directory from the host machine to the /app directory in the container.
+# This directory contains the EDF files used by the Flask application.
+COPY ./learn_edfs /app/learn_edfs
+
 # Expose port 8887 on the container.
 # This is the port on which the Flask application will listen for incoming requests.
 EXPOSE 8887

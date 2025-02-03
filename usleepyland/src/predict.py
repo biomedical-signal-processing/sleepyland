@@ -1,4 +1,5 @@
 from collections import defaultdict
+import requests
 from fastapi import FastAPI, File, UploadFile, Response, Form, Query
 from fastapi.responses import FileResponse, JSONResponse
 from typing import List, Dict
@@ -15,6 +16,7 @@ app = FastAPI()
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)s: %(message)s')
 logger = logging.getLogger(__name__)
 
+WTF_NPY_TO_ANNOT_URL = "http://wild-to-fancy:6666/npy-to-annot"
 
 def process_channels(channels):
     if len(channels) == 0 or channels[0] == '':
@@ -81,7 +83,6 @@ async def run_command_for_evaluation(
         "--project_dir", project_dir,
         "--save_true",
         "--data_split", "test_data",
-        "--strip_func", "strip_to_match",
         "--majority",
         "--no_argmax",
         "--out_dir", predictions_folder,
@@ -239,6 +240,7 @@ async def run_evaluation(
         # Run the command
         result = await run_command_for_evaluation(model, folder_path, predictions_folder, dataset, channels)
 
+        await create_annot_files(folder_name, model)
         # Post-process and calculate metrics
         os.chmod(predictions_folder, 0o777)
         metrics = calculate_metrics_for_files(predictions_folder, model)
@@ -271,6 +273,7 @@ async def run_prediction_one(model: str, folder_root_name: str, folder_name: str
         logger.debug(f"Predictions will be saved in {predictions_folder}")
 
         await run_command_for_prediction_one(model, full_extract_path, predictions_folder, channels)
+        await create_annot_files(folder_name, model)
         # Set folder permissions
         os.chmod(predictions_folder, 0o777)
 
@@ -376,6 +379,29 @@ async def run_ensemble_one(folder_name: str, models: List[str]):
     return JSONResponse(content={"message": "Prediction completed successfully."},
                         status_code=200)
 
+
+async def create_annot_files(folder_output_name, model):
+
+    folder_output_name = f"/app/output/{folder_output_name}/{model}"
+
+    for root, dirs, files in os.walk(folder_output_name):
+        for file in files:
+            if file.endswith('.npy') and 'TRUE' not in file:
+                folder_name = root.split('/')[-1]
+
+                logger.debug(f"folder_name: {folder_name}")
+                if folder_name == 'majority':
+                    channels = '.'
+                else:
+                    channels = folder_name.split('+')[0] + ', ' + folder_name.split('+')[-1]
+
+                logger.debug(f"channels: {channels}")
+
+                root += '/'
+
+                requests.post(WTF_NPY_TO_ANNOT_URL, data={'folder_path': root, 'channels': channels, 'model': model})
+
+                shutil.rmtree(root + 'logs')
 
 @app.post("/evaluate")
 async def evaluate(folder_root_name: str = Form(...), folder_name: str = Form(...),
