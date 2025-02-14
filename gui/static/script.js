@@ -146,6 +146,7 @@ const updateProprietaryChannelsButton = () => {
         checkbox.addEventListener('change', () => {
             if (checkbox.value === 'eeg') {
                 document.getElementById('yasa').disabled = !checkbox.checked;
+                document.getElementById('yasa').checked = false;
             }
             updateButtonLabel();
         });
@@ -304,6 +305,7 @@ const addCheckboxListeners = (menuElement, buttonElement, selectAllId, selectNon
         }
         if (selectNoneId === 'selectNoneEegChannels') {
             document.getElementById('yasa').disabled = selectNone.checked;
+            document.getElementById('yasa').checked = false;
         }
         updateButtonLabel();
     });
@@ -375,8 +377,6 @@ document.getElementById('proprietaryDataButton').addEventListener('click', () =>
     document.getElementById('validationBadgeChannels').classList.add('d-none');
     document.getElementById('validationBadgeAlgorithms').classList.add('d-none');
     removeRequiredAttribute('files');
-    document.getElementById('transformer').disabled = true;
-    document.getElementById('deepresnet').disabled = true;
 });
 
 // Function to toggle visibility of upload and related containers
@@ -854,6 +854,12 @@ const createCardsForConfMatrix = async (checkedAlgorithm, singleChannelEEG, sing
             metricsAlgorithm = 'USLEEP_NSRR2022_EOG';
         }else if (algorithm.toLowerCase() === 'usleep') {
             metricsAlgorithm = 'USLEEP_NSRR2022';
+        }else if (algorithm.toLowerCase() === 'ensemble' && singleChannelEEG) {
+            metricsAlgorithm = 'AFR_NSRR2022_EEG';
+        }else if (algorithm.toLowerCase() === 'ensemble' && singleChannelEOG) {
+            metricsAlgorithm = 'AFR_NSRR2022_EOG';
+        }else if (algorithm.toLowerCase() === 'ensemble') {
+            metricsAlgorithm = 'AFR_NSRR2022';
         }else{
             metricsAlgorithm = 'USLEEP_NSRR2022';
         }
@@ -1249,10 +1255,11 @@ document.getElementById('predictButton').addEventListener('click', async () => {
     const validationBadgeEdf = document.getElementById("validationBadgeEdf");
     const validationBadgeFolderName = document.getElementById("validationBadgeOutputFolder");
     const formData = new FormData();
+    const files = document.getElementById('edf-files').files;
 
-    //get file from edf-file input
-    const file = document.getElementById('edf-file').files[0];
-    formData.append('edf-file', file);
+    for (let i = 0; i < files.length; i++) {
+        formData.append('edf-files', files[i]);
+    }
 
     const folderName = document.getElementById('folderName').value;
     formData.append('folderName', folderName);
@@ -1261,7 +1268,7 @@ document.getElementById('predictButton').addEventListener('click', async () => {
 
     const isAnyAlgorithmChecked = Array.from(checkboxes).some(checkbox => checkbox.checked);
     const isAnyChannelSelected = Array.from(getCheckedChannels()).length > 0;
-    const isAnyFileSelected = file !== undefined;
+    const isAnyFileSelected = true;
     const isFolderNameValid = folderName.length > 0;
 
     validationBadgeTypeChannels.classList.toggle("d-none", isAnyChannelSelected);
@@ -1270,7 +1277,6 @@ document.getElementById('predictButton').addEventListener('click', async () => {
     validationBadgeFolderName.classList.toggle("d-none", isFolderNameValid);
 
     if (isAnyChannelSelected && isAnyAlgorithmChecked && isAnyFileSelected && isFolderNameValid) {
-        console.log('here');
 
         // Append selected channels for each type to formData
         formData.append('channels', getCheckedChannels())

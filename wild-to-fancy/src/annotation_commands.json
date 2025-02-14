@@ -105,7 +105,7 @@
                 "python", "/app/wild-to-fancy/wtfancy/bin/wtf.py", "extract_hypno",
                 "--file_regex", "{file_regex}",
                 "--out_dir", "{out_dir}",
-                "--dir_name", " -nsrr.xml",
+                "--dir_name", " .xml",
                 "--fill_blanks", "UNKNOWN",
                 "--seed", "123", "--overwrite"
             ]
@@ -116,7 +116,7 @@
                 "python", "/app/wild-to-fancy/wtfancy/bin/wtf.py", "extract_hypno",
                 "--file_regex", "{file_regex}",
                 "--out_dir", "{out_dir}",
-                "--dir_name", " -nsrr.xml",
+                "--dir_name", " .xml",
                 "--fill_blanks", "UNKNOWN",
                 "--seed", "123", "--overwrite"
             ]
@@ -127,7 +127,7 @@
                 "python", "/app/wild-to-fancy/wtfancy/bin/wtf.py", "extract_hypno",
                 "--file_regex", "{file_regex}",
                 "--out_dir", "{out_dir}",
-                "--dir_name", " -nsrr.xml",
+                "--dir_name", " .xml",
                 "--fill_blanks", "UNKNOWN",
                 "--seed", "123", "--overwrite"
             ]

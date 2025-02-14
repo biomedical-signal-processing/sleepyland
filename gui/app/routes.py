@@ -5,7 +5,7 @@ from app.services.graph_service import create_hypnogram, create_hypnodensity_gra
 from app.services.metrics_service import compute_metrics
 from app.services.get_channel_service import get_channels_from_hparam
 from app.utils.file_validation import validate_files
-from app.utils.file_handling import clear_directory, save_uploaded_files, save_edf_file
+from app.utils.file_handling import clear_directory, save_uploaded_files, save_edf_files
 from app.utils.logging_config import configure_logging
 from flask import jsonify
 import pandas as pd
@@ -119,6 +119,8 @@ def process():
     download_block = request.form.get('downloadBlock')
     models_selected = request.form.get('models')
 
+    log.debug(f"Processing files in: {files}")
+
     try:
 
         if download_block == "true":
@@ -160,10 +162,13 @@ def process():
 
         metrics = response.json()
 
+
         json_metrics = compute_metrics(metrics, log)
 
         models_selected = models_selected.split(",")
+
         create_hypnogram(folder_name, models_selected, False, log)
+
         create_hypnodensity_graph(folder_name, models_selected, log)
 
         return jsonify({
@@ -179,14 +184,9 @@ def process():
 @bp.route('/process_one', methods=['POST'])
 def process_one():
     folder_name = request.form.get('folderName')
-    uploaded_file = request.files.get('edf-file')
+    uploaded_files = request.files.getlist('edf-files')
     models_selected = request.form.get('models')
     channels_selected = request.form.get('channels')
-
-    log.debug(f"folder_name: {folder_name}")
-    log.debug(f"file: {uploaded_file}")
-    log.debug(f"models_selected: {models_selected}")
-    log.debug(f"channels_selected: {channels_selected}")
 
     channels_selected = channels_selected.split(",")
 
@@ -194,16 +194,18 @@ def process_one():
     channels_selected = [x.upper() for x in channels_selected]
 
     try:
+        log.debug(f"Processing files in: {folder_name}")
+        log.debug(f"Channels selected: {channels_selected}")
+        log.debug(f"Models selected: {models_selected}")
+        log.debug(f"Files: {uploaded_files}")
 
         #is_valid, error_response, status_code = validate_files(files)
         #if not is_valid:
         #   return jsonify(error_response), status_code
 
-        folder_root_name = save_edf_file(uploaded_file)
+        save_edf_files(uploaded_files, log)
 
-        log.debug(f"folder_root_name: {folder_root_name}")
-
-        response = sent_to_prediction_one_service(folder_root_name, folder_name, channels_selected, models_selected)
+        response = sent_to_prediction_one_service("myedf", folder_name, channels_selected, models_selected)
 
         if response.status_code == 500:
             return jsonify(

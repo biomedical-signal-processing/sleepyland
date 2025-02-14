@@ -63,7 +63,7 @@ RUN /bin/bash -c "source activate u-sleepyland-tfcuda && \
     pip install -r requirements.txt"
 
 # Set the LD_PRELOAD environment variable to the path of the libgomp shared library.
-ENV LD_PRELOAD=/opt/conda/envs/u-sleepyland-tfcuda/lib/libgomp.so.1
+ENV LD_PRELOAD=/opt/conda/envs/u-sleepyland-tfcuda/lib/python3.9/site-packages/sklearn/utils/../../scikit_learn.libs/libgomp-a34b3233.so.1.0.0
 
 # Expose port 7777 on the container for the FastAPI application.
 EXPOSE 7777
