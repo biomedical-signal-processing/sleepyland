@@ -58,10 +58,6 @@ def predict_service(folder_root_name, folder_name, eeg_channels, eog_channels, e
         models_generated.remove('ensemble')
         ensemble_checked = True
 
-
-    logger.debug(f"Models: {models}")
-    logger.debug(f"models_generated: {models_generated}")
-
     for model in models_generated:
 
         response = requests.post(EVALUATION_URL,
@@ -78,7 +74,6 @@ def predict_service(folder_root_name, folder_name, eeg_channels, eog_channels, e
 
         for root, dirs, files in os.walk(base_dir):
             for file in files:
-                logger.debug(f"File found: {file}")
                 if file.endswith("_TRUE.npy"):
                     source_path = os.path.join(root, file)
                     dest_path = os.path.join(true_folder_path, file)
@@ -94,7 +89,6 @@ def predict_service(folder_root_name, folder_name, eeg_channels, eog_channels, e
                     f"{model}": response_json.get(f"${model}", {})
                 })
 
-                logger.debug(f"Response for model {model}: {responses}")
             except Exception as e:
                 logger.error(f"Error parsing response for model {model}: {e}")
         else:
@@ -122,28 +116,44 @@ def predict_service(folder_root_name, folder_name, eeg_channels, eog_channels, e
     return {"message": "Prediction completed successfully.", "metrics": responses} if responses else {
         "message": "Prediction failed", "metrics": []}
 
-def predict_one_service(folder_root_name, folder_name, channels, models):
+def predict_one_service(folder_root_name, folder_name, channels, models, log):
     responses = []
     response = None
     ensemble_checked = False
+    edf_folder = '/app/input/myedf'
 
+    # Get all .edf files in the folder
+    edf_files = [f for f in os.listdir(edf_folder) if f.endswith('.edf')]
+
+    if not edf_files:
+        log.error("No EDF files found in /app/input/myedf")
+        return {"error": "No EDF files found"}
+
+    # Check if ensemble is selected
     models_generated = models[0].split(',')
 
     if 'ensemble' in models_generated:
         models_generated.remove('ensemble')
         ensemble_checked = True
 
-    for model in models_generated:
-        response = requests.post(PREDICT_ONE_URL,
-                                 data={'folder_root_name': folder_root_name,'folder_name': folder_name, 'channels': channels, 'model': model})
+    # Process each EDF file
+    for edf_file in edf_files:
 
-        if response.status_code == 200:
-            try:
-                logger.debug(f"Response for model {model}")
-            except Exception as e:
-                logger.error(f"Error parsing response for model {model}: {e}")
-        else:
-            logger.error(f"Failed to get response for model {model}. Status code: {response.status_code}")
+        for model in models_generated:
+            response = requests.post(PREDICT_ONE_URL, data={
+                'folder_root_name': edf_folder,
+                'folder_name': folder_name,
+                'channels': channels,
+                'model': model,
+                'file_name': edf_file
+            })
+            if response.status_code == 200:
+                try:
+                    logger.debug(f"Response for model {model}")
+                except Exception as e:
+                    logger.error(f"Error parsing response for model {model}: {e}")
+            else:
+                logger.error(f"Failed to get response for model {model}. Status code: {response.status_code}")
 
     if ensemble_checked:
         requests.post(ENSEMBLE_ONE_URL,

@@ -1,24 +1,33 @@
-# Usa l'immagine ufficiale di JupyterLab basata su Python
 FROM remnrem/lunapi:latest
 
 WORKDIR /app
 
 COPY ./src .
-
 COPY ./resources ../resources
 
+# Assicuriamoci di essere root e installiamo useradd se non presente
 USER root
-RUN useradd -ms /bin/bash user
+RUN apt-get update && apt-get install -y passwd && \
+    useradd -ms /bin/bash user && \
+    chown -R user:user /home/user /app /resources
 
-RUN apt-get update
-RUN pip install jupyterlab
-RUN pip install requests
+# Installazione dei pacchetti necessari
+RUN apt-get update && pip install jupyterlab requests yasa
 
-# Disable token and password authentication
-RUN echo "c.ServerApp.token = ''" >> /home/$NB_USER/.jupyter/jupyter_server_config.py
-RUN echo "c.ServerApp.password = ''" >> /home/$NB_USER/.jupyter/jupyter_server_config.py
-RUN echo "c.ServerApp.disable_check_xsrf = True" >> /home/$NB_USER/.jupyter/jupyter_server_config.py
+# Impostiamo l'utente 'user' per evitare problemi di permessi
+USER user
 
+# Creazione della cartella di configurazione di Jupyter con i permessi corretti
+RUN mkdir -p /home/user/.jupyter && \
+    echo "c.ServerApp.token = ''" >> /home/user/.jupyter/jupyter_server_config.py && \
+    echo "c.ServerApp.password = ''" >> /home/user/.jupyter/jupyter_server_config.py && \
+    echo "c.ServerApp.disable_check_xsrf = True" >> /home/user/.jupyter/jupyter_server_config.py
+
+# Esponiamo la porta 8888
 EXPOSE 8888
 
-CMD ["jupyter", "lab", "--ip=0.0.0.0", "--port=8888", "--no-browser"]
+# Comando di avvio di Jupyter
+CMD ["jupyter", "lab", "--ip=0.0.0.0", "--port=8888", "--allow-root"]
+
+
+

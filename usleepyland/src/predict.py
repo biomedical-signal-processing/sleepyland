@@ -98,8 +98,13 @@ async def run_command_for_evaluation(
     # Model-specific flags
     if model == "yasa":
         base_command += ["--model_external", "yasa"]
-    if model == "usleep" or model == "deepresnet":
+    if model == "usleep":
         base_command += ["--one_shot"]
+    if model == "transformer":
+        base_command += ["--non_overlapping"]
+        base_command += ["--is_logits"]
+    if model == "deepresnet":
+        base_command += ["--non_overlapping"]
 
     logger.debug(f"Running command: {base_command}")
     # Execute the command
@@ -166,6 +171,12 @@ async def run_command_for_prediction_one(model: str, folder_regex: str, predicti
         command.append("--model_external")
         command.append("yasa")
 
+    if model == "usleep":
+        command.append("--one_shot")
+
+    if model == "transformer":
+        command.append("--is_logits")
+
     logger.debug(f"Running command: {command}")
 
     # Execute command
@@ -197,20 +208,23 @@ def calculate_metrics_for_files(predictions_folder: str, model: str):
         if not os.path.exists(predicted_path):
             continue
 
-        true_labels = np.load(true_path).astype(int)
+        true_labels = np.load(true_path).astype(int).squeeze()
         predicted_labels = np.load(predicted_path).argmax(-1).astype(int)
+        mask = true_labels != 5
+        true_labels = true_labels[mask]
+        predicted_labels = predicted_labels[mask]
 
         # Compute metrics
         results.append({
             "file": base_name,
             "metrics": {
                 "f1_score": metrics.f1_score(true_labels, predicted_labels, average='macro'),
-                "f1_score_per_class": metrics.f1_score(true_labels, predicted_labels, average=None).tolist(),
+                "f1_score_per_class": metrics.f1_score(true_labels, predicted_labels, average=None, labels=[0,1,2,3,4]).tolist(),
                 "cohen_kappa": metrics.cohen_kappa_score(true_labels, predicted_labels),
                 "accuracy": metrics.accuracy_score(true_labels, predicted_labels),
                 "recall": metrics.recall_score(true_labels, predicted_labels, average='macro'),
                 "precision": metrics.precision_score(true_labels, predicted_labels, average='macro'),
-                "cm": (metrics.confusion_matrix(true_labels, predicted_labels, normalize='true') * 100).tolist()
+                "cm": (metrics.confusion_matrix(true_labels, predicted_labels, normalize='true', labels=[0,1,2,3,4]) * 100).tolist()
             }
         })
     return results
@@ -253,21 +267,17 @@ async def run_evaluation(
         return Response(content=f"An error occurred: {e}", status_code=500)
 
 
-async def run_prediction_one(model: str, folder_root_name: str, folder_name: str, channels: List[str]):
+async def run_prediction_one(model: str, folder_root_name: str, folder_name: str, channels: List[str], file_name: str):
     predictions_folder = f"/app/output/{folder_name}/{model}"
 
     try:
         upload_dir = "/app/input"
-        full_extract_path = os.path.join(upload_dir, folder_root_name) + '/*.edf'
+        full_extract_path = os.path.join(upload_dir, folder_root_name) + '/*' + file_name
 
         # Log found files
         for root, dirs, files in os.walk(full_extract_path):
             for file in files:
                 file_path = os.path.join(root, file)
-
-        # Remove existing prediction folder if exists
-        if os.path.exists(predictions_folder):
-            shutil.rmtree(predictions_folder)
 
         logger.debug(f"Running {model} prediction for {full_extract_path}")
         logger.debug(f"Predictions will be saved in {predictions_folder}")
@@ -276,8 +286,6 @@ async def run_prediction_one(model: str, folder_root_name: str, folder_name: str
         await create_annot_files(folder_name, model)
         # Set folder permissions
         os.chmod(predictions_folder, 0o777)
-
-        # metrics = calculate_metrics_for_files(predictions_folder, model)
 
         return JSONResponse(content={"message": "Prediction completed successfully."},
                             status_code=200)
@@ -347,8 +355,6 @@ async def run_ensemble_one(folder_name: str, models: List[str]):
 
     ensemble_dir = os.path.join(folder_path, "ensemble")
     os.makedirs(ensemble_dir, exist_ok=True)
-    logger.debug(f"Running ensemble prediction for {folder_name}")
-    logger.debug(f"Predictions will be saved in {ensemble_dir}")
     grouped_files = defaultdict(lambda: {'npy': []})
 
     for model in models:
@@ -360,10 +366,8 @@ async def run_ensemble_one(folder_name: str, models: List[str]):
 
         for file in os.listdir(majority_dir):
             if file.endswith('.npy'):
-                logger.debug(f"File found: {file}")
                 base_name = file.replace('_PRED.npy', '')
                 grouped_files[base_name]['npy'].append(os.path.join(majority_dir, file))
-                logger.debug(f"Added file: {base_name}")
 
     for key, file_groups in grouped_files.items():
         npy_data = [np.load(f) for f in file_groups['npy']]
@@ -389,13 +393,10 @@ async def create_annot_files(folder_output_name, model):
             if file.endswith('.npy') and 'TRUE' not in file:
                 folder_name = root.split('/')[-1]
 
-                logger.debug(f"folder_name: {folder_name}")
                 if folder_name == 'majority':
                     channels = '.'
                 else:
                     channels = folder_name.split('+')[0] + ', ' + folder_name.split('+')[-1]
-
-                logger.debug(f"channels: {channels}")
 
                 root += '/'
 
@@ -413,8 +414,8 @@ async def evaluate(folder_root_name: str = Form(...), folder_name: str = Form(..
 
 @app.post("/predict_one")
 async def prediction(folder_root_name: str = Form(...), folder_name: str = Form(...),
-                     channels: List[str] = Form(...), model: str = Form(...)):
-    return await run_prediction_one(model, folder_root_name, folder_name, channels)
+                     channels: List[str] = Form(...), model: str = Form(...), file_name: str = Form(...)):
+    return await run_prediction_one(model, folder_root_name, folder_name, channels, file_name)
 
 
 @app.post("/ensemble")

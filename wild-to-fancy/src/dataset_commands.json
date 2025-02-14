@@ -157,8 +157,7 @@
                 "--resample", "128",
                 "--channels", "C3-M2", "C3", "C4-M1", "C4", "Cz", "F3-M2", "F3", "F4-M1", "F4", "O1-M2", "O1", "O2-M1", "O2", "E1-M2", "E1", "E2-M1", "E2", "cchin", "cchin_l", "chin",
                 "--seed", "123",
-                "--overwrite",
-                "--del_substring"
+                "--overwrite"
             ]
         },
         {
@@ -172,8 +171,7 @@
                 "--resample", "128",
                 "--channels", "C3-M2", "C3", "C4-M1", "C4", "Cz", "F3-M2", "F3", "F4-M1", "F4", "O1-M2", "O1", "O2-M1", "O2", "E1-M2", "E1", "E2-M1", "E2", "cchin", "cchin_l", "chin",
                 "--seed", "123",
-                "--overwrite",
-                "--del_substring"
+                "--overwrite"
             ]
         },
         {
@@ -187,8 +185,7 @@
                 "--resample", "128",
                 "--channels", "C3-M2", "C4-M1", "E1-M2", "E2-M1", "E1", "E2", "LChin", "RChin", "L Chin", "R Chin", "L_CHIN-R_CHIN",
                 "--seed", "123",
-                "--overwrite",
-                "--del_substring"
+                "--overwrite"
             ]
         },
         {

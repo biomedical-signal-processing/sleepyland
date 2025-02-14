@@ -76,7 +76,7 @@ async def perform_evaluation(folder_root_name, folder_name, eeg_channels, eog_ch
 async def perform_prediction_one(folder_root_name, folder_name, channels, models):
     """Performs prediction using the predict_service and handles exceptions."""
     try:
-        response = predict_one_service(folder_root_name, folder_name, channels, models)
+        response = predict_one_service(folder_root_name, folder_name, channels, models,logger)
         return response
     except Exception as e:
         logger.error(f"An error occurred: {str(e)}")

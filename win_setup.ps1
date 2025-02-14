@@ -1,97 +1,88 @@
-# Ensure Docker and Docker Compose are installed
-if (-not (Get-Command docker -ErrorAction SilentlyContinue))
-{
-    Write-Host "Docker is required. Please install it and try again."
-}
-if (-not (Get-Command docker -ErrorAction SilentlyContinue))
-{
-    Write-Host "[ERROR] Docker is required. Please install it and try again."
-    exit 1
+# Check if Docker is installed, if not, download and install Docker Desktop for Windows
+if (-not (Get-Command docker -ErrorAction SilentlyContinue)) {
+    Write-Host "Docker is not installed. Downloading and installing Docker Desktop for Windows..."
+    
+    # Download the Docker Desktop installer
+    $dockerInstallerUrl = "https://desktop.docker.com/win/main/amd64/Docker%20Desktop%20Installer.exe"
+    $installerPath = "$env:USERPROFILE\Downloads\DockerInstaller.exe"
+    
+    Start-BitsTransfer -Source $dockerInstallerUrl -Destination $installerPath
+    
+    # Install Docker Desktop
+    Write-Host "Installing Docker Desktop..."
+    Start-Process -FilePath $installerPath -Verb RunAs -Wait 
+    
+	$dockerProcess = Get-Process -Name "Docker Desktop" -ErrorAction SilentlyContinue
+	if (-not $dockerProcess) {
+		Write-Host "Starting Docker Desktop..."
+		Start-Process -FilePath "$env:ProgramFiles\Docker\Docker\Docker Desktop.exe" -NoNewWindow
+		
+		# Wait for Docker to start
+		Write-Host "Waiting for Docker to start..."
+		while ($true) {
+			$dockerStatus = docker ps 2>$null
+			if ($dockerStatus -ne $null) {
+				Write-Host "Docker daemon started successfully."
+				break
+			}
+			Write-Host "Docker daemon not started yet. Retrying in 10 seconds..."
+			Start-Sleep -Seconds 10
+		}
+		Write-Host "Docker installed successfully."
+	}
+
+    Write-Host "Docker is installed."
 }
 
-if (-not (Get-Command docker-compose -ErrorAction SilentlyContinue))
-{
-    Write-Host "Docker Compose is required. Please install it and try again."
-    exit 1
-}
-else
-{
-    Write-Host "[INFO] Docker is installed."
-}
+Write-Host "Docker is already installed."
 
-if (-not (Get-Command docker-compose -ErrorAction SilentlyContinue))
-{
-    Write-Host "[ERROR] Docker Compose is required. Please install it and try again."
-    exit 1
-}
-else
-{
-    Write-Host "[INFO] Docker Compose is installed."
-}
-
-# Function to pull images from Docker Hub
-function PullImages
-{
-    Write-Host "[INFO] Pulling pre-built images from Docker Hub..."
-    try
-    {
+# Pull the Docker images from Docker Hub
+function PullImages {
+    Write-Host "[INFO] Download images from Docker Hub..."
+    try {
         docker pull bspsupsi/sleepyland:gui
         docker pull bspsupsi/sleepyland:manager-api
         docker pull bspsupsi/sleepyland:usleepyland
         docker pull bspsupsi/sleepyland:notebook
         docker pull bspsupsi/sleepyland:nsrr-download
         docker pull bspsupsi/sleepyland:wild-to-fancy
-        Write-Host "[INFO] Docker images pulled successfully."
-    }
-    catch
-    {
-        Write-Host "[ERROR] Failed to pull Docker images. Please check your internet connection or Docker Hub access."
+        Write-Host "[INFO] Images downloaded successfully."
+    } catch {
+        Write-Host "[ERROR] Error downloading images from Docker Hub."
         exit 1
     }
 }
 
 $forcePull = $true
 
-# Pull Docker images if there were changes in the repository
-if ($forcePull)
-{
+# Download the Docker images from Docker Hub
+if ($forcePull) {
     PullImages
-}
-else
-{
-    Write-Host "[INFO] No Docker images pull required."
+} else {
+    Write-Host "[INFO] No update required for the Docker images."
 }
 
-# Start Docker containers with --force-recreate
-Write-Host "[INFO] Starting Docker containers with forced recreation..."
-try
-{
+# Start the Docker containers
+Write-Host "[INFO] Starting the Docker containers..."
+try {
     docker compose -f docker-compose.yml -p sleepyland up -d --force-recreate
-    if ($?)
-    {
-        Write-Host "[INFO] Docker containers started successfully."
-    }
-    else
-    {
-        Write-Host "[ERROR] Failed to start Docker containers."
+    if ($?) {
+        Write-Host "[INFO] Containers started successfully."
+    } else {
+        Write-Host "[ERROR] Error in the Docker Compose command. Check the Docker Compose configuration."
         exit 1
     }
-}
-catch
-{
-    Write-Host "[ERROR] Docker Compose failed to start the containers. Please check the Docker Compose configuration."
+} catch {
+    Write-Host "[ERROR] Error starting the Docker containers."
     exit 1
 }
 
 # Open the web interface in the default browser
-Write-Host "[INFO] Opening the web interface in the default browser..."
-try
-{
+Write-Host "[INFO] Opening the web interface..."
+try {
     Start-Process "http://localhost:8887"
     Write-Host "[INFO] Web interface opened successfully."
-}
-catch
-{
-    Write-Host "[ERROR] Failed to open the web interface. Please check your default browser settings."
+} catch {
+    Write-Host "[ERROR] Error opening the web interface."
     exit 1
 }

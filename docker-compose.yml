@@ -1,6 +1,6 @@
 services:
   gui:
-    image: bspsupsi/sleepyland:gui
+    #image: bspsupsi/sleepyland:gui
     build:
       context: ./gui
     container_name: gui_container
@@ -13,7 +13,7 @@ services:
       - ./output:/app/output
 
   manager-api:
-    image: bspsupsi/sleepyland:manager-api  # Use the image from Docker Hub
+    #image: bspsupsi/sleepyland:manager-api
     build:
       context: ./manager-api
     container_name: manager_container
@@ -24,7 +24,7 @@ services:
       - ./output:/app/output
 
   notebook:
-    image: bspsupsi/sleepyland:notebook  # Use the image from Docker Hub
+    #image: bspsupsi/sleepyland:notebook
     build:
       context: ./notebook
     container_name: notebook_container
@@ -36,7 +36,7 @@ services:
       - ./output:/app/output
 
   nsrr-download:
-    image: bspsupsi/sleepyland:nsrr-download  # Use the image from Docker Hub
+    #image: bspsupsi/sleepyland:nsrr-download
     build:
       context: ./nsrr-download
     container_name: nsrr_download_container
@@ -47,18 +47,20 @@ services:
       - ./output:/app/output
 
   usleepyland:
-    image: bspsupsi/sleepyland:usleepyland  # Use the image from Docker Hub
+    #image: bspsupsi/sleepyland:usleepyland
     build:
       context: ./usleepyland
     container_name: usleepyland_container
     ports:
       - "7777:7777"
+    environment:
+      - LD_PRELOAD=/opt/conda/envs/u-sleepyland-tfcuda/lib/libgomp.so.1:/opt/conda/envs/u-sleepyland-tfcuda/lib/python3.9/site-packages/sklearn/utils/../../scikit_learn.libs/libgomp-d22c30c5.so.1.0.0
     volumes:
       - ./input:/app/input
       - ./output:/app/output
 
   wild-to-fancy:
-    image: bspsupsi/sleepyland:wild-to-fancy
+    #image: bspsupsi/sleepyland:wild-to-fancy
     build:
       context: wild-to-fancy
     container_name: wild_to_fancy_container

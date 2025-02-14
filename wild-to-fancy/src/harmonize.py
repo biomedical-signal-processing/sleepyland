@@ -101,6 +101,15 @@ async def harmonize(folder_name: str = Form(...), dataset: str = Form(...)):
 
     processed_files = os.listdir(processed_output_dir)
 
+    if dataset == "learn":
+        os.chmod(processed_output_dir, 0o777)
+
+        for root, dirs, files in os.walk(processed_output_dir):
+            for dir_name in dirs:
+                os.chmod(os.path.join(root, dir_name), 0o777)
+            for file in files:
+                os.chmod(os.path.join(root, file), 0o777)
+
     if processed_files:
         return {"message": "Files processed successfully", "files": processed_files}
     else:

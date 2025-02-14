@@ -13,15 +13,22 @@ def save_uploaded_files(files):
         file.save(save_path)
     return folder_root_name
 
-def save_edf_file(file):
-    relative_path = file.filename
-    folder_root_name = relative_path.split(".")[0]
+def save_edf_files(files, log):
+    save_dir = '/app/input/myedf'
+    os.makedirs(save_dir, exist_ok=True)  # Ensure the directory exists
 
-    relative_path = folder_root_name + "/" + relative_path
-    save_path = os.path.join('/app/input', relative_path)
-    os.makedirs(os.path.dirname(save_path), exist_ok=True)
-    file.save(save_path)
-    return folder_root_name
+    for file in files:
+        log.debug(f"Processing file: {file.filename}")
+
+        # Construct full file path
+        file_path = os.path.join(save_dir, file.filename)
+        log.debug(f"Saving to: {file_path}")
+
+        try:
+            file.save(file_path)
+            log.info(f"File saved: {file_path}")
+        except Exception as e:
+            log.error(f"Error saving file {file.filename}: {e}")
 
 
 def clear_directory(directory: str):
