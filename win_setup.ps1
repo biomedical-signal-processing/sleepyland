@@ -20,6 +20,7 @@ if (-not (Get-Command docker -ErrorAction SilentlyContinue)) {
 		# Wait for Docker to start
 		Write-Host "Waiting for Docker to start..."
 		while ($true) {
+  			$env:Path = [System.Environment]::GetEnvironmentVariable("Path", [System.EnvironmentVariableTarget]::Machine)
 			$dockerStatus = docker ps 2>$null
 			if ($dockerStatus -ne $null) {
 				Write-Host "Docker daemon started successfully."

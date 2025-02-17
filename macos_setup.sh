@@ -4,8 +4,18 @@
 install_docker() {
     echo "[INFO] Docker not found. Attempting to install Docker..."
 
+    ARCH=$(uname -m)
+
+    if [ "$ARCH" = "x86_64" ]; then
+        echo "[INFO] Architecture detected: amd64 (x86_64)"
+        DOCKER_URL="https://desktop.docker.com/mac/main/amd64/Docker.dmg"
+    elif [ "$ARCH" = "arm64" ]; then
+        echo "[INFO] architecture detected: arm64"
+        DOCKER_URL="https://desktop.docker.com/mac/main/arm64/Docker.dmg"
+    fi
+
     # Download Docker Desktop for Mac using curl and open the downloaded file
-    curl -o ~/Downloads/Docker.dmg https://desktop.docker.com/mac/stable/Docker.dmg
+    curl -o ~/Downloads/Docker.dmg "$DOCKER_URL"
 
     # Mount the DMG
     hdiutil attach ~/Downloads/Docker.dmg
