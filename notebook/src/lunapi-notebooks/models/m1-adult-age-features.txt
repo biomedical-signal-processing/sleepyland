@@ -1,0 +1,155 @@
+% ------------------------------------------------------------
+% model descriptors
+%
+
+title      <- "Age prediction (adults)"
+reference  <- "Sun et al (2019) Neurobiology of Aging"
+training   <- "MGH sleep database (N=2,936), Bayesian ridge regression"
+outcome    <- "Age (years)"
+type       <- "linear"
+
+data       <- "m1-adult-age-data.txt"
+knn        <- 10 
+minf       <- 5 
+softplus   <- 1
+log1p      <- 0
+
+% ------------------------------------------------------------
+% requirements:
+%
+%  signals   : 1+ central EEGs (mastoid ref., SR = 200 Hz, uV units )
+%  filtering : 60 Hz notch, bandpass 0.5-20 Hz
+%  epochwise artifact rejection: flat or |amplitude| > 500 uV
+
+% ------------------------------------------------------------
+% model specification format: 
+% terms: whitespace delimited
+%
+%    label coef mean std CMD VAR STRATA CH (REQ)
+%      STRATA: FACTOR/LEVEL,FACTOR/LEVEL  (or . for baseline)
+%      CH : comma-delimited list
+
+% if multiple values match, take the average for the final 'value'
+%  i.e. across channels 
+
+% variables can be specified as ${x} and these will be expanded out using the
+% standard Luna scheme (i.e. via script assignment, SET-VAR or vars=<file> 
+
+% REQ is optional: REQ=T or REQ=1 or REQ=Y implies that feature cannot be
+%   missing;  the defualt is to allow a feature to be missing (if we have
+%   a valid kNN imputer attached), up to 'minf' minimum non-missing features
+
+% by default, features are either assumed to come from the cache, as above (CMD/VAR/STRATA/CH)
+% alternatively, it can from a Luna variable - which will be swapped in when reading the model file
+% (this is done repeatedly, for each EDF processed, i.e. so individual-specific variables can be
+% put in.   This is assumed if we have a VALUE=${x} statement (i.e. instead of CMD/VAR/STRATA/CH)
+% still require B/M/SD... (and REQ can be T or F); but cannot mix cache-specification w/ variable-spec.
+
+% ------------------------------------------------------------
+% special variables: key-value pairs w/ '<-' assignment operator
+%
+%    model_intercept <- 48.95428315479082;
+%    model_str       <- "value here"
+%
+% expected: title, reference, outcome, type, training
+% optional: data, knn, minf, softplus
+
+
+% ------------------------------------------------------------
+% model 13 terms :
+%  how to find in the cache ( CMD / VAR / STRATA / CH )
+%  training data mean/standard deviation ( m / sd ), used to standardize features
+%  estimated coefficient (b) - for standardized features 
+
+theta_bandpower_kurtosis_C_N2
+  CMD=MTM   VAR=SPECKURT   STRATA=STG/N2,B/THETA
+  b=-3.744438781807309    m=7.46162965    sd=2.5574401
+
+% example of specifying a value
+%theta_kurtosis_C_N2
+% VALUE=12.3
+% b=-3.744438781807309    m=7.46162965    sd=2.5574401
+
+% or more likely: e.g. where ${sex} is coded 0/1 where ${sex} is already set
+%male_sex
+% VALUE=${sex}
+% b=-0.22 m=0.48 sd=0.5
+
+alpha_bandpower_kurtosis_C_N2  
+  CMD=MTM  VAR=SPECKURT   STRATA=STG/N2,B/ALPHA
+  b=-3.1845094671039282   m=7.33154885   sd=2.59845088  
+
+kurtosis_N2_C
+  CMD=STATS VAR=KURT_MN STRATA=STG/N2  CH=${cen}    
+  b=-0.0522327876337815  m=2.8510925  sd=1.34910998  
+
+delta_theta_mean_C_N3
+ CMD=MTM  VAR=RATIO  STRATA=STG/N3,B1/DELTA,B2/THETA  CH=${cen}
+ b=1.3862066290295623 m=1.22491537  sd=0.458185908 
+
+delta_alpha_mean_C_N3
+  CMD=MTM  VAR=RATIO  STRATA=STG/N3,B1/DELTA,B2/ALPHA  CH=${cen}
+  b=-1.3485014347395534  m=1.34399072  sd=0.548410626 
+
+delta_bandpower_mean_C_N3
+  CMD=MTM  VAR=MTM  STRATA=STG/N3,B/DELTA  CH=${cen}
+  b=-2.620558181111738  m=1.44500033 sd=0.618703915 
+
+theta_bandpower_kurtosis_C_N3
+  CMD=MTM  VAR=SPECKURT  STRATA=STG/N3,B/THETA
+  b=0.15728176698657031  m=5.36434049  sd=2.04592795  
+
+delta_bandpower_kurtosis_C_N2
+  CMD=MTM VAR=SPECKURT  STRATA=STG/N2,B/DELTA
+  b=-1.868672153370003  m=17.017404  sd=4.07117585  
+
+kurtosis_N3_C
+  CMD=STATS VAR=KURT_MN STRATA=STG/N3  CH=${cen}
+  b=-1.2475374894488704  m=1.08606488  sd=0.576482078 
+
+alpha_bandpower_mean_C_N1
+  CMD=MTM  VAR=MTM STRATA=STG/N1,B/ALPHA  CH=${cen} 
+  b=2.2910798782822255  m=0.068192904 sd=0.047435647
+
+DENS_C
+  CMD=SPINDLES VAR=DENS STRATA=F/13.5,STG/N2 CH=${cen}
+  b=-1.6653464503199618  m=4.51358313  sd=1.91159981
+
+sigma_bandpower_kurtosis_C_N2 
+  CMD=MTM VAR=SPECKURT STRATA=STG/N2,B/SIGMA
+  b=1.2479003681970666  m=15.1965052  sd=4.74928702  
+
+COUPL_OVERLAP_C
+  CMD=SPINDLES  VAR=COUPL_OVERLAP  STRATA=F/13.5,STG/N2 CH=${cen}
+  b=-0.8046781757620637  m=366.302452  sd=191.716141  
+
+
+
+
+
+% ------------------------------------------------------------
+% special variables
+
+intercept <- 48.95428315479082
+
+bias_correction_slope <- -0.5354289074617437
+
+bias_correction_intercept <- 26.21153834514247
+
+bias_correction_term <- ${age}
+
+
+% for reference:
+%     b=-3.744438781807309        m=7.46162965     sd=2.5574401   
+%     b=-3.1845094671039282       m=7.33154885	   sd=2.59845088  
+%     b=-0.0522327876337815       m=2.8510925	   sd=1.34910998  
+%     b=1.3862066290295623	  m=1.22491537	   sd=0.458185908 
+%     b=-1.3485014347395534       m=1.34399072	   sd=0.548410626 
+%     b=-2.620558181111738	  m=1.44500033	   sd=0.618703915 
+%     b=0.15728176698657031       m=5.36434049	   sd=2.04592795  
+%     b=-1.868672153370003	  m=17.017404	   sd=4.07117585  
+%     b=-1.2475374894488704       m=1.08606488	   sd=0.576482078 
+%     b=-0.8046781757620637       m=366.302452	   sd=191.716141  
+%     b=-1.6653464503199618       m=4.51358313	   sd=1.91159981  
+%     b=1.2479003681970666	  m=15.1965052	   sd=4.74928702  
+%     b=2.2910798782822255	  m=0.068192904    sd=0.047435647 

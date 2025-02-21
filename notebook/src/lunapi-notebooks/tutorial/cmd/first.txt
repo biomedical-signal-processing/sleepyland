@@ -1,0 +1,22 @@
+% Set epoch duration
+% (anything following '%' is a comment)
+
+EPOCH len=30
+
+% Assign a label ('tag') in the output,
+% which will be set to the value of the 'stage' variable
+
+TAG tag=STAGE/${stage}
+
+% Restrict to epochs that match the ${stage} variable
+% i.e. MASK them out if they do *not* match
+
+MASK ifnot=${stage}
+
+% Having set a mask above, now actually remove the masked epochs
+
+RESTRUCTURE
+
+% Produce basic statistics on this reduced dataset
+
+STATS sig=EEG

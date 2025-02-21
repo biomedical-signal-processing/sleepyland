@@ -1,0 +1,5 @@
+EPOCH len=${myepoch}
+MASK all
+MASK unmask-if=${nrem}
+RESTRUCTURE
+STATS sig=${eeg}

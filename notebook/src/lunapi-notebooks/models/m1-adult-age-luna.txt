@@ -1,0 +1,137 @@
+
+
+% --------------------------------------------------------------------------------
+%
+% Store the original (i.e. return to this after processing)
+%
+% --------------------------------------------------------------------------------
+
+FREEZE ORIG
+
+% --------------------------------------------------------------------------------
+%
+% Instruct cache which metrics to record (for final PREDICT)
+%
+% --------------------------------------------------------------------------------
+
+
+CACHE cache=p1 record=MTM,MTM,B,CH,STG
+CACHE cache=p1 record=MTM,SPECKURT,B,STG
+CACHE cache=p1 record=MTM,RATIO,B1,B2,CH,STG
+CACHE cache=p1 record=STATS,KURT_MN,CH,STG
+CACHE cache=p1 record=SPINDLES,DENS,F,CH,STG
+CACHE cache=p1 record=SPINDLES,COUPL_OVERLAP,F,CH,STG
+
+
+% --------------------------------------------------------------------------------
+%
+% Pre-processing EEGs (1 or more central signals) 
+%
+% --------------------------------------------------------------------------------
+
+EPOCH
+
+uV sig=${cen}
+
+FILTER sig=${cen} bandpass=0.25,22.5 tw=0.5,5 ripple=0.002,0.002
+
+RESAMPLE sig=${cen} sr=200
+
+CHEP-MASK sig=${cen} max=500,0.001 flat=0.1,1e-4
+CHEP epochs
+RE preserve-cache
+
+ROBUST-NORM sig=${cen} IQR 
+
+
+% --------------------------------------------------------------------------------
+%
+% Freeze the entire recordings after preprocessing, prior to stage-specific tasks
+%
+% --------------------------------------------------------------------------------
+
+FREEZE ALL
+
+
+% --------------------------------------------------------------------------------
+%
+% N1 metrics
+%
+% --------------------------------------------------------------------------------
+
+TAG STG/N1
+
+MASK ifnot=N1
+
+RE preserve-cache
+
+MTM sig=${cen} nw=2 segment-sec=2 segment-inc=1 detrend
+    delta=0.5-4 theta=4-8 alpha=8-12 sigma=12-20
+    alternate-speckurt epoch
+
+
+% --------------------------------------------------------------------------------
+%
+% N2 metrics
+%
+% --------------------------------------------------------------------------------
+
+THAW tag=ALL preserve-cache
+
+TAG STG/N2
+MASK ifnot=N2
+
+RE preserve-cache
+
+MTM sig=${cen} nw=2 segment-sec=2 segment-inc=1 detrend
+    delta=0.5-4 theta=4-8 alpha=8-12 sigma=12-20
+    alternate-speckurt epoch
+
+STATS sig=${cen} epoch
+
+% nb. orig pipeline ran SPINDLES on completely unpreprocessed signals
+SPINDLES sig=${cen} fc=13.5 cycles=12 max=10 so mag=1.5
+
+
+% --------------------------------------------------------------------------------
+%
+% N3 metrics
+%
+% --------------------------------------------------------------------------------
+
+THAW tag=ALL preserve-cache
+
+TAG STG/N3
+
+MASK ifnot=N3
+
+RE preserve-cache
+
+MTM sig=${cen} nw=2 segment-sec=2 segment-inc=1 detrend 
+    delta=0.5-4 theta=4-8 alpha=8-12 sigma=12-20
+    alternate-speckurt ratio=DELTA/THETA,DELTA/ALPHA ratio1 epoch
+
+STATS sig=${cen} epoch
+
+% --------------------------------------------------------------------------------
+%
+% clean up, check cache
+%
+% --------------------------------------------------------------------------------
+
+TAG STG/.
+
+%CACHE dump num=p1
+
+
+% --------------------------------------------------------------------------------
+%
+% Final prediction
+%
+% --------------------------------------------------------------------------------
+
+PREDICT model=${mpath}/m1-adult-age-features.txt data=${mpath}/m1-adult-age-data.txt cache=p1 th=${th}
+
+% other options: data drop dump-model
+
+THAW ORIG
