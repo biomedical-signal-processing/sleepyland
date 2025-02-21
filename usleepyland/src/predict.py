@@ -2,7 +2,7 @@ from collections import defaultdict
 import requests
 from fastapi import FastAPI, File, UploadFile, Response, Form, Query
 from fastapi.responses import FileResponse, JSONResponse
-from typing import List, Dict
+from typing import List, Dict, Optional
 import sklearn.metrics as metrics
 import subprocess
 import os
@@ -71,7 +71,7 @@ def get_project_dir(model: str, channels: Dict[str, List[str]]) -> str:
 
 
 async def run_command_for_evaluation(
-        model: str, folder_regex: str, predictions_folder: str, dataset: str, channels: Dict[str, List[str]]
+        model: str, folder_regex: str, predictions_folder: str, dataset: str, channels: Dict[str, List[str]], resolution: str
 ) -> str:
     """Run the prediction command for a specific model."""
     project_dir = get_project_dir(model, channels)
@@ -100,6 +100,8 @@ async def run_command_for_evaluation(
         base_command += ["--model_external", "yasa"]
     if model == "usleep":
         base_command += ["--one_shot"]
+        if resolution:
+            base_command += ["--data_per_prediction", resolution]
     if model == "transformer":
         base_command += ["--non_overlapping"]
         base_command += ["--is_logits"]
@@ -115,7 +117,7 @@ async def run_command_for_evaluation(
     return result.stdout
 
 
-async def run_command_for_prediction_one(model: str, folder_regex: str, predictions_folder: str, channels: List[str]):
+async def run_command_for_prediction_one(model: str, folder_regex: str, predictions_folder: str, channels: List[str], resolution: str) -> str:
     if len(channels) == 1 and channels[0] == '':
         channels = []
 
@@ -173,6 +175,9 @@ async def run_command_for_prediction_one(model: str, folder_regex: str, predicti
 
     if model == "usleep":
         command.append("--one_shot")
+        if resolution:
+            command.append("--data_per_prediction")
+            command.append(resolution)
 
     if model == "transformer":
         command.append("--is_logits")
@@ -232,7 +237,7 @@ def calculate_metrics_for_files(predictions_folder: str, model: str):
 
 async def run_evaluation(
         model: str, folder_root_name: str, folder_name: str, eeg_channels: List[str], eog_channels: List[str],
-        dataset: str
+        dataset: str, resolution: str
 ) -> JSONResponse:
     """Run a complete prediction for a given model."""
     predictions_folder = f"/app/output/{folder_name}/{model}"
@@ -252,7 +257,7 @@ async def run_evaluation(
         }
 
         # Run the command
-        result = await run_command_for_evaluation(model, folder_path, predictions_folder, dataset, channels)
+        result = await run_command_for_evaluation(model, folder_path, predictions_folder, dataset, channels, resolution)
 
         await create_annot_files(folder_name, model)
         # Post-process and calculate metrics
@@ -267,7 +272,7 @@ async def run_evaluation(
         return Response(content=f"An error occurred: {e}", status_code=500)
 
 
-async def run_prediction_one(model: str, folder_root_name: str, folder_name: str, channels: List[str], file_name: str):
+async def run_prediction_one(model: str, folder_root_name: str, folder_name: str, channels: List[str], file_name: str, resolution: str) -> JSONResponse:
     predictions_folder = f"/app/output/{folder_name}/{model}"
 
     try:
@@ -282,7 +287,7 @@ async def run_prediction_one(model: str, folder_root_name: str, folder_name: str
         logger.debug(f"Running {model} prediction for {full_extract_path}")
         logger.debug(f"Predictions will be saved in {predictions_folder}")
 
-        await run_command_for_prediction_one(model, full_extract_path, predictions_folder, channels)
+        await run_command_for_prediction_one(model, full_extract_path, predictions_folder, channels, resolution)
         await create_annot_files(folder_name, model)
         # Set folder permissions
         os.chmod(predictions_folder, 0o777)
@@ -407,15 +412,15 @@ async def create_annot_files(folder_output_name, model):
 @app.post("/evaluate")
 async def evaluate(folder_root_name: str = Form(...), folder_name: str = Form(...),
                    eeg_channels: List[str] = Form(...), eog_channels: List[str] = Form(...),
-                   emg_channels: List[str] = Form(...), dataset: str = Form(...), model: str = Form(...)):
+                   emg_channels: List[str] = Form(...), dataset: str = Form(...), model: str = Form(...), resolution: Optional[str] = Form(None)):
     return await run_evaluation(model, folder_root_name, folder_name, eeg_channels, eog_channels,
-                                dataset)
+                                dataset, resolution)
 
 
 @app.post("/predict_one")
 async def prediction(folder_root_name: str = Form(...), folder_name: str = Form(...),
-                     channels: List[str] = Form(...), model: str = Form(...), file_name: str = Form(...)):
-    return await run_prediction_one(model, folder_root_name, folder_name, channels, file_name)
+                     channels: List[str] = Form(...), model: str = Form(...), file_name: str = Form(...), resolution: Optional[str] = Form(None)):
+    return await run_prediction_one(model, folder_root_name, folder_name, channels, file_name, resolution)
 
 
 @app.post("/ensemble")

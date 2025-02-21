@@ -36,17 +36,12 @@ RUN conda init bash
 WORKDIR /app/uSLEEPYLAND
 
 # Copy the environment.yaml file from the host machine to the /app/uSLEEPYLAND directory in the container.
-COPY environment.yaml .
 
 # Copy the src/ directory from the host machine to the /app/uSLEEPYLAND directory in the container.
 COPY src/ /app/uSLEEPYLAND/src/
 
 # Copy the model/ directory from the host machine to the /app/uSLEEPYLAND/ directory in the container.
 COPY model/ /app/uSLEEPYLAND/
-
-RUN rm requirements.txt
-
-COPY requirements.txt .
 
 # Create a new conda environment named u-sleepyland-tfcuda using the environment.yaml file.
 RUN conda env create -f environment.yaml

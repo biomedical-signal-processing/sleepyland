@@ -131,10 +131,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const fileList = await getFileList(); // Get the list of files
         const fileToRead = fileList.find(file => file.startsWith(dataset)); // Find the relevant file
 
-        console.log(fileList);
-        console.log(fileToRead);
-
-
         if (fileToRead) {
             const options = await readFileContent(fileToRead); // Read file content
             updateFileSelect(options); // Update the file select options

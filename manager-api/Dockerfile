@@ -14,7 +14,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 # Install Python dependencies (avoiding cache to keep the image light)
-RUN pip3 install --no-cache-dir -r /app/requirements.txt
+RUN pip3 install --no-cache-dir -r requirements.txt
 
 # Set PYTHONPATH to ensure the application can find the src module
 ENV PYTHONPATH="${PYTHONPATH}:/app/src"

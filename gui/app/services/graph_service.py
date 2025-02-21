@@ -151,7 +151,7 @@ def create_hypnodensity_graph(folder_name, models_selected, log, is_logits=False
                     y=cumulative_probs[:, j],
                     mode='lines',
                     name=stage_names[j],
-                    line=dict(width=2, color=colors[j]),  # Set line color
+                    line=dict(width=0, color=colors[j]),  # Set line color
                     fill='tonexty',
                     fillcolor=f'rgba{tuple(int(colors[j][i:i + 2], 16) for i in (1, 3, 5)) + (0.5,)}',
                     # Convert HEX to RGBA

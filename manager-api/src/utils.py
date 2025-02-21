@@ -47,24 +47,35 @@ def harmonize_service(dataset_name: str):
     return harmonize_data
 
 
-def predict_service(folder_root_name, folder_name, eeg_channels, eog_channels, emg_channels, dataset, models):
+def predict_service(folder_root_name, folder_name, eeg_channels, eog_channels, emg_channels, dataset, models, resolution):
     responses = []
     response = None
     ensemble_checked = False
-    models_generated = models[0].split(',')
+
 
     #if model_generated containes 'ensemble' then remove it
-    if 'ensemble' in models_generated:
-        models_generated.remove('ensemble')
-        ensemble_checked = True
+    if 'ensemble' in models:
+        if resolution == "30" or resolution is None:
+            models.remove('ensemble')
+            ensemble_checked = True
+        else:
+            models.remove('ensemble')
 
-    for model in models_generated:
+    if resolution is not None:
+        try:
+            resolution = int(resolution)
+            if 30 % resolution == 0:
+                result = resolution * 128
+                resolution = str(result)
+        except ValueError:
+            print("Error: Resolution number is not valid")
+
+    for model in models:
 
         response = requests.post(EVALUATION_URL,
                                  data={'folder_root_name': folder_root_name, 'folder_name': folder_name,
                                        'eeg_channels': eeg_channels, 'eog_channels': eog_channels,
-                                       'emg_channels': emg_channels, 'dataset': dataset, 'model': model})
-
+                                       'emg_channels': emg_channels, 'dataset': dataset, 'model': model, 'resolution': resolution})
 
         base_dir = '/app/output/' + folder_name + '/' + model
 
@@ -96,7 +107,7 @@ def predict_service(folder_root_name, folder_name, eeg_channels, eog_channels, e
 
     if ensemble_checked:
         response = requests.post(ENSEMBLE_URL,
-                                 data={'folder_name': folder_name, 'models': models_generated})
+                                 data={'folder_name': folder_name, 'models': models})
 
         if response.status_code == 200:
             try:
@@ -116,7 +127,7 @@ def predict_service(folder_root_name, folder_name, eeg_channels, eog_channels, e
     return {"message": "Prediction completed successfully.", "metrics": responses} if responses else {
         "message": "Prediction failed", "metrics": []}
 
-def predict_one_service(folder_root_name, folder_name, channels, models, log):
+def predict_one_service(folder_root_name, folder_name, channels, models, log, resolution):
     responses = []
     response = None
     ensemble_checked = False
@@ -130,22 +141,34 @@ def predict_one_service(folder_root_name, folder_name, channels, models, log):
         return {"error": "No EDF files found"}
 
     # Check if ensemble is selected
-    models_generated = models[0].split(',')
 
-    if 'ensemble' in models_generated:
-        models_generated.remove('ensemble')
-        ensemble_checked = True
+    if 'ensemble' in models:
+        if resolution == "30" or resolution is None:
+            models.remove('ensemble')
+            ensemble_checked = True
+        else:
+            models.remove('ensemble')
+
+    if resolution is not None:
+        try:
+            resolution = int(resolution)
+            if 30 % resolution == 0:
+                result = resolution * 128
+                resolution = str(result)
+        except ValueError:
+            print("Error: Resolution number is not valid")
 
     # Process each EDF file
     for edf_file in edf_files:
 
-        for model in models_generated:
+        for model in models:
             response = requests.post(PREDICT_ONE_URL, data={
                 'folder_root_name': edf_folder,
                 'folder_name': folder_name,
                 'channels': channels,
                 'model': model,
-                'file_name': edf_file
+                'file_name': edf_file,
+                'resolution': resolution
             })
             if response.status_code == 200:
                 try:
@@ -157,6 +180,6 @@ def predict_one_service(folder_root_name, folder_name, channels, models, log):
 
     if ensemble_checked:
         requests.post(ENSEMBLE_ONE_URL,
-                                 data={'folder_name': folder_name, 'models': models_generated})
+                                 data={'folder_name': folder_name, 'models': models})
 
     return {"message": "Prediction completed successfully."}

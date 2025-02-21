@@ -93,9 +93,6 @@ async def harmonize(folder_name: str = Form(...), dataset: str = Form(...)):
     if os.path.exists(log_dir):
         shutil.rmtree(log_dir)
 
-    logger.debug(f"Removing: {extract_dir}")
-    logger.debug(f"Removing: {dataset}")
-
     if extract_dir.split("/")[-1] != dataset:
         shutil.rmtree(extract_dir)
 

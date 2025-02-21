@@ -1,4 +1,0 @@
-% this is a test Luna script that uses variables
-FILTER sig=${s} bandpass=${lwr},${upr} ripple=0.002 tw=1
-MASK ifnot=${stage}
-PSD sig=${s} spectrum dB

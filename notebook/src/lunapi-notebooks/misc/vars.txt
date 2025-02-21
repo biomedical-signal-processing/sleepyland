@@ -1,4 +1,0 @@
-ID	age
-learn-nsrr01	60
-learn-nsrr02	61
-learn-nsrr03	62

@@ -348,6 +348,10 @@ document.getElementById('uploadButton').addEventListener('click', () => {
     addRequiredAttribute('folderName');
     document.getElementById('transformer').disabled = false;
     document.getElementById('deepresnet').disabled = false;
+    const checkboxes = document.querySelectorAll('#algorithms-select input[type="checkbox"]:checked');
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = false;
+    });
     resetUploadForm(); // Reset form fields
     $('#dataModal').modal('hide'); // Hide modal
 });
@@ -357,6 +361,10 @@ document.getElementById('downloadNsrrButton').addEventListener('click', () => {
     toggleUploadContainerVisibility(false);
     document.getElementById('transformer').disabled = false;
     document.getElementById('deepresnet').disabled = false;
+    const checkboxes = document.querySelectorAll('#algorithms-select input[type="checkbox"]:checked');
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = false;
+    });
     resetDownloadForm(); // Reset form fields
     $('#dataModal').modal('hide'); // Hide modal
 });
@@ -376,6 +384,13 @@ document.getElementById('proprietaryDataButton').addEventListener('click', () =>
     document.getElementById('predictButton').disabled = false;
     document.getElementById('validationBadgeChannels').classList.add('d-none');
     document.getElementById('validationBadgeAlgorithms').classList.add('d-none');
+    document.getElementById('folderName').value = '';
+
+    const checkboxes = document.querySelectorAll('#algorithms-select input[type="checkbox"]:checked');
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = false;
+    });
+
     removeRequiredAttribute('files');
 });
 
@@ -554,6 +569,8 @@ async function sendRequest() {
         // Disable submit button and hide navigation buttons during processing
         button.disabled = true;
         document.getElementById('nextPrevButtonDiv').style.setProperty('display', 'none', 'important');
+        document.getElementById('nextPrevButtonDivHypno').style.setProperty('display', 'none', 'important');
+        document.getElementById('nextPrevButtonDivPerformance').style.setProperty('display', 'none', 'important');
 
         // Set status to processing, open sleep-stages tab, and scroll to top
         status.textContent = 'Processing...';
@@ -561,12 +578,9 @@ async function sendRequest() {
         statusPerformance.textContent = 'Processing...';
 
         //clear the cards
-        const cardContainer = document.getElementById('card-container');
-        const cardContainerHypno = document.getElementById('card-container-hypno');
-        const cardContainerPerformance = document.getElementById('card-container-performance');
-        cardContainer.innerHTML = '';
-        cardContainerHypno.innerHTML = '';
-        cardContainerPerformance.innerHTML = '';
+        document.getElementById('card-container').innerHTML = '';
+        document.getElementById('card-container-hypno').innerHTML = '';
+        document.getElementById('card-container-performance').innerHTML = '';
 
         new bootstrap.Tab(document.getElementById('sleep-stages-tab')).show();
         window.scrollTo(0, 0);
@@ -855,11 +869,11 @@ const createCardsForConfMatrix = async (checkedAlgorithm, singleChannelEEG, sing
         }else if (algorithm.toLowerCase() === 'usleep') {
             metricsAlgorithm = 'USLEEP_NSRR2022';
         }else if (algorithm.toLowerCase() === 'ensemble' && singleChannelEEG) {
-            metricsAlgorithm = 'AFR_NSRR2022_EEG';
+            metricsAlgorithm = 'SUV_NSRR2022_EEG';
         }else if (algorithm.toLowerCase() === 'ensemble' && singleChannelEOG) {
-            metricsAlgorithm = 'AFR_NSRR2022_EOG';
+            metricsAlgorithm = 'SUV_NSRR2022_EOG';
         }else if (algorithm.toLowerCase() === 'ensemble') {
-            metricsAlgorithm = 'AFR_NSRR2022';
+            metricsAlgorithm = 'SUV_NSRR2022';
         }else{
             metricsAlgorithm = 'USLEEP_NSRR2022';
         }
@@ -1250,6 +1264,8 @@ function getCheckedChannels() {
 document.getElementById('predictButton').addEventListener('click', async () => {
     const button = document.getElementById('predictButton');
     const status = document.getElementById('status');
+    const statusHypno = document.getElementById('statusHypno');
+    const statusPerformance = document.getElementById('statusPerformance');
     const validationBadgeTypeChannels = document.getElementById("validationBadgeTypeChannels");
     const validationBadgeAlgorithms = document.getElementById("validationBadgeAlgorithms");
     const validationBadgeEdf = document.getElementById("validationBadgeEdf");
@@ -1290,9 +1306,17 @@ document.getElementById('predictButton').addEventListener('click', async () => {
         // Disable submit button and hide navigation buttons during processing
         button.disabled = true;
         document.getElementById('nextPrevButtonDiv').style.setProperty('display', 'none', 'important');
+        document.getElementById('nextPrevButtonDivHypno').style.setProperty('display', 'none', 'important');
+        document.getElementById('nextPrevButtonDivPerformance').style.setProperty('display', 'none', 'important');
+        //clear the cards
+        document.getElementById('card-container').innerHTML = '';
+        document.getElementById('card-container-hypno').innerHTML = '';
+        document.getElementById('card-container-performance').innerHTML = '';
 
         // Set status to processing, open sleep-stages tab, and scroll to top
         status.textContent = 'Processing...';
+        statusHypno.textContent = 'Processing...';
+        statusPerformance.textContent = 'No data to display';
         new bootstrap.Tab(document.getElementById('sleep-stages-tab')).show();
         window.scrollTo(0, 0);
 

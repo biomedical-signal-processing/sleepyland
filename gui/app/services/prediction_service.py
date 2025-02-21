@@ -14,7 +14,7 @@ def send_to_evaluation_service(folder_root_name, folder_name, eeg_channels, eog_
         'eog_channels': eog_channels,
         'emg_channels': emg_channels,
         'dataset': dataset,
-        'models': models_selected,
+        'models': models_selected
     })
 
 def sent_to_prediction_one_service(folder_root_name, folder_name, channels, models_selected):

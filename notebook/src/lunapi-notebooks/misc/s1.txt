@@ -1,4 +1,0 @@
-ID	s1
-learn-nsrr01	EEG
-learn-nsrr02	EMG
-learn-nsrr03	ECG

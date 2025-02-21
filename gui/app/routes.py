@@ -89,10 +89,8 @@ def get_directories(study):
 async def reset_directories():
     try:
         input_directory = "./input"
-        output_directory = "./output"
 
         clear_directory(input_directory)
-        clear_directory(output_directory)
 
         return {"message": "Directories reset successfully"}
     except Exception as e:
@@ -107,7 +105,7 @@ async def quit_system():
         return {"error": f"An error occurred: {e}"}
 
 @bp.route('/process', methods=['POST'])
-def process():
+async def process():
     folder_name = request.form.get('folderName')
     files = request.files.getlist('files')
     dataset = request.form.get('dataset-select')
@@ -118,8 +116,9 @@ def process():
     emg_channels = ['']
     download_block = request.form.get('downloadBlock')
     models_selected = request.form.get('models')
+    models_selected = models_selected.split(",")
 
-    log.debug(f"Processing files in: {files}")
+    await reset_directories()
 
     try:
 
@@ -162,10 +161,7 @@ def process():
 
         metrics = response.json()
 
-
         json_metrics = compute_metrics(metrics, log)
-
-        models_selected = models_selected.split(",")
 
         create_hypnogram(folder_name, models_selected, False, log)
 
@@ -182,27 +178,20 @@ def process():
 
 
 @bp.route('/process_one', methods=['POST'])
-def process_one():
+async def process_one():
     folder_name = request.form.get('folderName')
     uploaded_files = request.files.getlist('edf-files')
     models_selected = request.form.get('models')
     channels_selected = request.form.get('channels')
 
     channels_selected = channels_selected.split(",")
+    models_selected = models_selected.split(",")
 
-    #to upper case
+    await reset_directories()
+
     channels_selected = [x.upper() for x in channels_selected]
 
     try:
-        log.debug(f"Processing files in: {folder_name}")
-        log.debug(f"Channels selected: {channels_selected}")
-        log.debug(f"Models selected: {models_selected}")
-        log.debug(f"Files: {uploaded_files}")
-
-        #is_valid, error_response, status_code = validate_files(files)
-        #if not is_valid:
-        #   return jsonify(error_response), status_code
-
         save_edf_files(uploaded_files, log)
 
         response = sent_to_prediction_one_service("myedf", folder_name, channels_selected, models_selected)
@@ -211,10 +200,7 @@ def process_one():
             return jsonify(
                 {'error': f'Prediction failed with status code: {response.status_code}'}), response.status_code
 
-
-        models_selected = models_selected.split(",")
         create_hypnogram(folder_name, models_selected, True, log)
-
 
         create_hypnodensity_graph(folder_name, models_selected, log)
 

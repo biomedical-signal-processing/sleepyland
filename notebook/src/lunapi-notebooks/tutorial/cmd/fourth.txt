@@ -1,5 +1,0 @@
-mV
-RESAMPLE sr=100
-FILTER bandpass=0.3,35 ripple=0.02 tw=1 fft
-REFERENCE ref=EEG1 sig=EEG2
-WRITE edf-tag=v2 edf-dir=newedfs/ sample-list=new.lst

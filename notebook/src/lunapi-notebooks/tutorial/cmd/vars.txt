@@ -1,6 +1,0 @@
-alias	EEG1|EEG
-alias	EEG2|EEG(sec)
-alias	OXSTAT|"OX STAT"
-eeg	EEG1,EEG2
-myepoch	10
-nrem	N1,N2,N3
