@@ -3,9 +3,6 @@
 
 !Dockerfile
 
-!requirements.txt
-!environment.yaml
-
 !hyperparameters/*
 !src/*
 !model/*

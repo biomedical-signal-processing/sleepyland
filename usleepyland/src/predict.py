@@ -144,11 +144,16 @@ async def run_command_for_prediction_one(model: str, folder_regex: str, predicti
         }
     }
 
+    referencing_channels = channels.copy()
+
+    if "MASTOID" in channels:
+        referencing_channels.remove("MASTOID")
+
     # Check if the model is valid and the channels are not empty
     if model in project_dirs:
-        if len(channels) == 1:
+        if len(referencing_channels) == 1:
             # If only one channel is selected, use it directly or default if no match
-            project_dir = project_dirs[model].get(channels[0], project_dirs[model]["default"])
+            project_dir = project_dirs[model].get(referencing_channels[0], project_dirs[model]["default"])
         else:
             # If no specific channel is selected, use the default
             project_dir = project_dirs[model]["default"]
@@ -158,8 +163,7 @@ async def run_command_for_prediction_one(model: str, folder_regex: str, predicti
                   "python", "./utime/bin/ut.py", "predict_one", "--num_gpus", "0",
                   "-f", folder_regex,
                   "--seed", "123",
-                  "--auto_channel_grouping"] + channels + ["MASTOID",
-                                                           "--auto_reference_types"] + channels + [
+                  "--auto_channel_grouping"] + channels + ["--auto_reference_types"] + referencing_channels + [
                   "--project_dir", project_dir,
                   "--strip_func", "trim_psg_trailing",
                   "--majority",

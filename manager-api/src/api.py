@@ -30,7 +30,12 @@ async def get_all_channels(dataset: str = Query(...)):
 @app.post("/download_data")
 async def download_data(token: str = Form(...), selected_datasets: list[str] = Form(...)):
     try:
-        requests.post(NSRR_DOWNLOAD_URL, data={'token': token, 'selected_datasets': selected_datasets})
+        response = requests.post(NSRR_DOWNLOAD_URL, data={'token': token, 'selected_datasets': selected_datasets})
+
+        if response.status_code != 200:
+            return JSONResponse(content={"error": "An error occurred while downloading data. Token may be invalid."},
+                                media_type="application/json",
+                                status_code=500)
 
         return JSONResponse(content={"message": "Data downloaded successfully."}, media_type="application/json")
 

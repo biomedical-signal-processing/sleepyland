@@ -65,15 +65,19 @@ async def download_data(token: str = Form(...), selected_datasets: List[str] = F
             run_command(["expect", SCRIPT_PATH, token, edf_file])
 
             input_folder = create_input_folder(edf_file)
-            move_file(f'/app/{edf_file}', os.path.join(input_folder, os.path.basename(edf_file)))
 
-            clean_up(folder_name)
+            if not os.path.exists(f'/app/{edf_file}'):
+                raise FileNotFoundError(f"EDF file not found at /app/{edf_file}")
+            else:
+                move_file(f'/app/{edf_file}', os.path.join(input_folder, os.path.basename(edf_file)))
 
-            run_command([SCRIPT_PATH, token, xml_file])
+                clean_up(folder_name)
 
-            move_file(f'/app/{xml_file}', os.path.join(input_folder, os.path.basename(xml_file)))
+                run_command([SCRIPT_PATH, token, xml_file])
 
-            clean_up(folder_name)
+                move_file(f'/app/{xml_file}', os.path.join(input_folder, os.path.basename(xml_file)))
+
+                clean_up(folder_name)
 
         except Exception as e:
             return JSONResponse(content={"error": str(e)}, status_code=500)

@@ -118,7 +118,6 @@ async def process():
     models_selected = request.form.get('models')
     models_selected = models_selected.split(",")
 
-    await reset_directories()
 
     try:
 
@@ -126,7 +125,7 @@ async def process():
             response = handle_download_block(download_dataset, folder_name, eeg_channels, eog_channels, emg_channels,
                                              models_selected)
         else:
-
+            await reset_directories()
             if dataset == "learn":
                 source_folder = "/app/learn_edfs"
 

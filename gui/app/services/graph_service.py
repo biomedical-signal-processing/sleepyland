@@ -18,9 +18,7 @@ def create_hypnogram(folder_name, models_selected, is_predict_one, log):
         majority_folder = f'/app/output/{folder_name}/{model}/majority'
         if not is_predict_one:
             true_folder = f'/app/output/{folder_name}/{model}/TRUE_files'
-        log.debug(f"----Processing")
         majority_files = sorted([file for file in os.listdir(majority_folder) if file.endswith('.npy')])
-        log.debug(f"--------------Processing")
         if not is_predict_one:
             true_files = sorted(os.listdir(true_folder))
 
@@ -31,7 +29,7 @@ def create_hypnogram(folder_name, models_selected, is_predict_one, log):
                 sleep_stages_majority = np.load(os.path.join(majority_folder, maj_file)).argmax(-1).astype(int)
                 np.set_printoptions(threshold=np.inf)
 
-                time = np.arange(len(sleep_stages_majority)) * 30
+                time = np.arange(len(sleep_stages_majority))
                 sleep_stage_labels = ['Wake', 'NREM1', 'NREM2', 'NREM3', 'REM']
                 sleep_stages_labels_majority = [sleep_stage_labels[stage] for stage in sleep_stages_majority]
                 colors = {
@@ -47,7 +45,7 @@ def create_hypnogram(folder_name, models_selected, is_predict_one, log):
                                             marker=dict(size=5, color=[colors[stage] for stage in sleep_stages_majority]),
                                             name='Pred'))
                 fig.update_layout(title=f"{maj_file.split('.')[0].split('_')[0]}",
-                                    xaxis=dict(title='Time (seconds)'),
+                                    xaxis=dict(title='Sleep Epoch'),
                                     yaxis=dict(title='Sleep Stage', categoryorder='array',
                                                  categoryarray=['NREM3', 'NREM2', 'NREM1', 'REM', 'Wake']),
                                     yaxis_range=[-0.5, 4.5])
@@ -72,7 +70,7 @@ def create_hypnogram(folder_name, models_selected, is_predict_one, log):
 
                 sleep_stages_majority[mask] = np.nan
                 sleep_stages_true[mask] = np.nan
-                time = np.arange(len(sleep_stages_majority), dtype=float) * 30
+                time = np.arange(len(sleep_stages_majority), dtype=float)
                 time[mask] = np.nan
 
                 sleep_stage_labels = ['Wake', 'NREM1', 'NREM2', 'NREM3', 'REM']
@@ -107,7 +105,7 @@ def create_hypnogram(folder_name, models_selected, is_predict_one, log):
                                                                      sleep_stages_true]),
                                                   name='True'))
                 fig_combined.update_layout(title=f"{maj_file.split('.')[0].split('_')[0]} (Pred vs True)",
-                                           xaxis=dict(title='Time (seconds)'),
+                                           xaxis=dict(title='Sleep Epoch'),
                                            yaxis=dict(title='Sleep Stage', categoryorder='array',
                                                       categoryarray=['NREM3', 'NREM2', 'NREM1', 'REM', 'Wake']),
                                            yaxis_range=[-0.5,
@@ -158,7 +156,7 @@ def create_hypnodensity_graph(folder_name, models_selected, log, is_logits=False
                     hoverinfo='none'
                 ))
             fig.update_layout(title=f"{maj_file.split('.')[0].split('_')[0]}",
-                              xaxis_title='Time (seconds)',
+                              xaxis_title='Sleep Epoch',
                               yaxis_title='Cumulative Probability',
                               yaxis_range=[0, 1],
                               showlegend=True,

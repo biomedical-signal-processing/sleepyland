@@ -53,9 +53,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('card-uploader').style.backgroundColor = isDarkMode ? '#272a2e' : '#f7f7f7';
     document.getElementById('channels-card').style.backgroundColor = isDarkMode ? '#272a2e' : '#f7f7f7';
     document.getElementById('algorithms-select').style.backgroundColor = isDarkMode ? '#272a2e' : '#f7f7f7';
+    document.getElementById('file-select-download-button').style.backgroundColor = isDarkMode ? '#222529' : '#ffffff';
 
     document.getElementById('dropdownMenuButtonEEG').style.backgroundColor = isDarkMode ? '#222529' : '#ffffff';
     document.getElementById('dropdownMenuButtonEOG').style.backgroundColor = isDarkMode ? '#222529' : '#ffffff';
+    document.getElementById('dropdown-menu-button-proprietary-channels').style.backgroundColor = isDarkMode ? '#222529' : '#ffffff';
+
+    document.getElementById('pops-link').style.color = isDarkMode ? '#ffffff' : '#000000';
+    document.getElementById('yasa-link').style.color = isDarkMode ? '#ffffff' : '#000000';
+    document.getElementById('usleep-link').style.color = isDarkMode ? '#ffffff' : '#000000';
+    document.getElementById('deepresnet-link').style.color = isDarkMode ? '#ffffff' : '#000000';
+    document.getElementById('transformer-link').style.color = isDarkMode ? '#ffffff' : '#000000';
+    document.getElementById('ensemble-link').style.color = isDarkMode ? '#ffffff' : '#000000';
+    document.getElementById('lseqsleepnet-link').style.color = isDarkMode ? '#ffffff' : '#000000';
+
     // Adjust logo and theme based on mode
     document.getElementById('logo').src = isDarkMode
         ? '../static/images/sleepyland_logo_dark.png'
@@ -477,7 +488,10 @@ document.getElementById('openSourceButton').addEventListener('click', () => {
 
 // Sends a download request for data, updates UI elements, and populates channel options based on dataset
 const downloadData = async (token, subjectsList, dataset) => {
+    const validationBadgeTokenSubmission = document.getElementById("validationBadgeTokenSubmission");
+
     try {
+        validationBadgeTokenSubmission.classList.toggle("d-none", true);
         // Send POST request to download data with provided token and subjectsList
         const response = await fetch('/download_data', {
             method: 'POST',
@@ -503,7 +517,12 @@ const downloadData = async (token, subjectsList, dataset) => {
             // Fetch and populate channels for the specified dataset
             await fetchAndPopulateChannels(dataset);
         } else {
-            alert('An error occurred.');
+            document.getElementById('loading-gif-container').style.setProperty('display', 'none', 'important');
+            document.getElementById('download-nsrr-files').disabled = false;
+            document.getElementById('file-select-download-button').disabled = false;
+            document.getElementById('dataset-select-download').disabled = false;
+            document.getElementById('nsrrToken').disabled = false;
+            validationBadgeTokenSubmission.classList.toggle("d-none", false);
         }
     } catch (error) {
         console.error('An error occurred while downloading:', error);
