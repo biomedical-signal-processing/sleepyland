@@ -80,7 +80,7 @@ fi
 
 # Start Docker containers with --force-recreate
 echo "[INFO] Starting Docker containers with forced recreation..."
-docker compose -f docker-compose.yml -p sleepyland up -d --force-recreate
+docker-compose -f docker-compose.yml -p sleepyland up -d --force-recreate
 if [ $? -eq 0 ]; then
     echo "[INFO] Docker containers started successfully."
 else
