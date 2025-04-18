@@ -44,23 +44,23 @@ def get_project_dir(model: str, channels: Dict[str, List[str]]) -> str:
     """Determine the project directory based on the model and available channels."""
     project_dirs = {
         "deepresnet": {
-            "eeg": "./deepresnet-nsrr-2022_eeg",
-            "eog": "./deepresnet-nsrr-2022_eog",
-            "default": "./deepresnet-nsrr-2022"
+            "eeg": "./deepresnet-nsrr-2024_eeg",
+            "eog": "./deepresnet-nsrr-2024_eog",
+            "default": "./deepresnet-nsrr-2024"
         },
         "usleep": {
-            "eeg": "./u-sleep-nsrr-2022_eeg",
-            "eog": "./u-sleep-nsrr-2022_eog",
-            "default": "./u-sleep-nsrr-2022"
+            "eeg": "./u-sleep-nsrr-2024_eeg",
+            "eog": "./u-sleep-nsrr-2024_eog",
+            "default": "./u-sleep-nsrr-2024"
         },
         "yasa": {
             "eeg": "./yasa_eeg",
             "default": "./yasa"
         },
         "transformer": {
-            "eeg": "./sleeptransformer-nsrr-2022_eeg",
-            "eog": "./sleeptransformer-nsrr-2022_eog",
-            "default": "./sleeptransformer-nsrr-2022"
+            "eeg": "./sleeptransformer-nsrr-2024_eeg",
+            "eog": "./sleeptransformer-nsrr-2024_eog",
+            "default": "./sleeptransformer-nsrr-2024"
         }
     }
 
@@ -124,23 +124,23 @@ async def run_command_for_prediction_one(model: str, folder_regex: str, predicti
     # Define the project directory mapping for each model and channel
     project_dirs = {
         "deepresnet": {
-            "EEG": "./deepresnet-nsrr-2022_eeg",
-            "EOG": "./deepresnet-nsrr-2022_eog",
-            "default": "./deepresnet-nsrr-2022"
+            "EEG": "./deepresnet-nsrr-2024_eeg",
+            "EOG": "./deepresnet-nsrr-2024_eog",
+            "default": "./deepresnet-nsrr-2024"
         },
         "usleep": {
-            "EEG": "./u-sleep-nsrr-2022_eeg",
-            "EOG": "./u-sleep-nsrr-2022_eog",
-            "default": "./u-sleep-nsrr-2022"
+            "EEG": "./u-sleep-nsrr-2024_eeg",
+            "EOG": "./u-sleep-nsrr-2024_eog",
+            "default": "./u-sleep-nsrr-2024"
         },
         "yasa": {
             "EEG": "./yasa_eeg",
             "default": "./yasa"
         },
         "transformer": {
-            "EEG": "./sleeptransformer-nsrr-2022_eeg",
-            "EOG": "./sleeptransformer-nsrr-2022_eog",
-            "default": "./sleeptransformer-nsrr-2022"
+            "EEG": "./sleeptransformer-nsrr-2024_eeg",
+            "EOG": "./sleeptransformer-nsrr-2024_eog",
+            "default": "./sleeptransformer-nsrr-2024"
         }
     }
 
@@ -439,7 +439,7 @@ async def ensemble_one(folder_name: str = Form(...), models: List[str] = Form(..
 
 @app.post("/get_channels")
 async def get_channels_from_hparam(dataset: str = Query(...)):
-    yaml_path = f"/app/uSLEEPYLAND/u-sleep-nsrr-2022/hyperparameters/dataset_configurations/{dataset}.yaml"
+    yaml_path = f"/app/uSLEEPYLAND/u-sleep-nsrr-2024/hyperparameters/dataset_configurations/{dataset}.yaml"
     try:
         with open(yaml_path, "r") as f:
             hparam_content = yaml.safe_load(f)
@@ -463,12 +463,12 @@ async def get_channels_from_hparam(dataset: str = Query(...)):
 async def init_models():
     try:
         result = subprocess.run(
-            ["python", "./utime/bin/ut.py", "init", "--name", "deepresnet-nsrr-2022", "--model", "deepresnet",
+            ["python", "./utime/bin/ut.py", "init", "--name", "deepresnet-nsrr-2024", "--model", "deepresnet",
              "--overwrite"],
             capture_output=True, text=True)
 
         result = subprocess.run(
-            ["python", "./utime/bin/ut.py", "init", "--name", "usleep-nsrr-2022", "--model", "usleep", "--overwrite"],
+            ["python", "./utime/bin/ut.py", "init", "--name", "usleep-nsrr-2024", "--model", "usleep", "--overwrite"],
             capture_output=True, text=True)
 
         if result.returncode != 0:
@@ -562,3 +562,64 @@ def weighted_predict_proba_ensemble(predictions, weights):
     ensemble_proba = np.average(predictions, axis=1, weights=weights)
 
     return ensemble_proba
+
+# HV
+
+def hard_voting_ensemble(predictions):
+    """
+    Performs hard voting ensemble by selecting the most common class across classifiers.
+    In case of no majority, the most probable class is picked.
+
+    Args:
+        predictions: list of numpy arrays of shape [n_samples, n_classes] containing the predicted probabilities
+
+    Returns:
+        A numpy array of shape [n_samples, n_classes] containing one-hot encoded predicted class labels
+    """
+    stacked_predictions = _prepare_predictions(predictions)
+    _check_predictions(stacked_predictions)
+
+    class_predictions = np.argmax(stacked_predictions, axis=2)  # Shape: [n_samples, n_classifiers]
+
+    majority_votes = np.apply_along_axis(lambda x: np.bincount(x, minlength=5), axis=1, arr=class_predictions)
+    max_votes = np.max(majority_votes, axis=1, keepdims=True)
+
+    candidate_classes = (majority_votes == max_votes)
+
+    averaged_predictions = np.mean(stacked_predictions, axis=1)
+    final_class_indices = np.where(candidate_classes.sum(axis=1) == 1,
+                                   np.argmax(candidate_classes, axis=1),
+                                   np.argmax(averaged_predictions, axis=1))
+
+    final_predictions = np.zeros_like(averaged_predictions)
+    final_predictions[np.arange(final_predictions.shape[0]), final_class_indices] = 1
+
+    return final_predictions
+
+# soft class weighted voting SCWV
+
+def class_weighted_soft_voting_ensemble(predictions, class_weights):
+    """
+    Performs class-weighted soft voting ensemble by averaging the predicted probabilities from multiple classifiers
+    with given per-class weights.
+
+    Args:
+        predictions: list of numpy arrays of shape [n_samples, n_classes] containing the predicted probabilities
+        class_weights: numpy array of shape [n_classifiers, n_classes] containing class-specific weights for each classifier
+
+    Returns:
+        A numpy array of shape [n_samples, n_classes] containing the class-weighted averaged predicted probabilities
+    """
+    stacked_predictions = _prepare_predictions(predictions)
+    _check_predictions(stacked_predictions)
+
+    # Apply weights to predictions
+    weighted_predictions = stacked_predictions * class_weights[np.newaxis, :, :]
+
+    # Combine weighted scores across classifiers
+    combined_predictions = np.sum(weighted_predictions, axis=1) / np.sum(class_weights,axis=0, keepdims=True)
+
+    # Normalize to maintain probability distribution
+    combined_predictions = combined_predictions / np.sum(combined_predictions, axis=1, keepdims=True)
+
+    return combined_predictions

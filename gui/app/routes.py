@@ -46,11 +46,10 @@ def get_channels():
 @bp.route('/get_reference_metrics', methods=['POST'])
 def get_reference_metrics():
     model = request.json.get("model")
-    metrics_df = pd.read_csv("utils/all_models_metrics.csv", index_col=[0, 1])
-    means = metrics_df.xs("mean", level=1).loc[:, [col for col in metrics_df.columns if "Global" in col or "F1" in col]].loc[model,:]
-    stds = metrics_df.xs("std", level=1).loc[:,[col for col in metrics_df.columns if "Global" in col or "F1" in col]].loc[model,:]
+    metrics_df = pd.read_csv("utils/sleepyland_recording_wise_metrics.csv", index_col=[0, 1])
+    values = metrics_df.xs("Avg Overall", level=1).loc[:, [col for col in metrics_df.columns if "Cohen's Kappa" not in col]].loc[model,:]
 
-    return jsonify({"means": means.to_dict(), "stds": stds.to_dict()}), 200
+    return jsonify({"values": values.to_dict()}), 200
 
 
 @bp.route('/download_data', methods=['POST'])

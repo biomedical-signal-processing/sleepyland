@@ -111,6 +111,9 @@ def compute_metrics(metrics, log):
         if not data:
             continue
 
+        # create directory if not exists
+        os.makedirs('/app/static/performances', exist_ok=True)
+
         with open(f'/app/static/performances/metrics_{i}.json', 'w') as f:
             json.dump(data, f)
         i += 1

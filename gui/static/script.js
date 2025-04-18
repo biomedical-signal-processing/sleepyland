@@ -870,45 +870,45 @@ const createCardsForConfMatrix = async (checkedAlgorithm, singleChannelEEG, sing
         let metricsAlgorithm;
 
         if (algorithm.toLowerCase() === 'deepresnet' && singleChannelEEG) {
-            metricsAlgorithm = 'DEEPRESNET_NSRR2022_EEG';
+            metricsAlgorithm = 'deepresnet EEG';
         }else if (algorithm.toLowerCase() === 'deepresnet' && singleChannelEOG) {
-            metricsAlgorithm = 'DEEPRESNET_NSRR2022_EOG';
+            metricsAlgorithm = 'deepresnet EOG';
         }else if (algorithm.toLowerCase() === 'deepresnet') {
-            metricsAlgorithm = 'DEEPRESNET_NSRR2022';
+            metricsAlgorithm = 'deepresnet EEG/EOG';
         }else if (algorithm.toLowerCase() === 'transformer' && singleChannelEEG) {
-            metricsAlgorithm = 'SLEEPTRANSFORMER_NSRR2022_EEG';
+            metricsAlgorithm = 'sleeptransformer EEG';
         }else if (algorithm.toLowerCase() === 'transformer' && singleChannelEOG) {
-            metricsAlgorithm = 'SLEEPTRANSFORMER_NSRR2022_EOG';
+            metricsAlgorithm = 'sleeptransformer EOG';
         }else if (algorithm.toLowerCase() === 'transformer') {
-            metricsAlgorithm = 'SLEEPTRANSFORMER_NSRR2022';
+            metricsAlgorithm = 'sleeptransformer EEG/EOG';
         }else if (algorithm.toLowerCase() === 'usleep' && singleChannelEEG) {
-            metricsAlgorithm = 'USLEEP_NSRR2022_EEG';
+            metricsAlgorithm = 'u-sleep EEG';
         }else if (algorithm.toLowerCase() === 'usleep' && singleChannelEOG) {
-            metricsAlgorithm = 'USLEEP_NSRR2022_EOG';
+            metricsAlgorithm = 'u-sleep EOG';
         }else if (algorithm.toLowerCase() === 'usleep') {
-            metricsAlgorithm = 'USLEEP_NSRR2022';
+            metricsAlgorithm = 'u-sleep EEG/EOG';
         }else if (algorithm.toLowerCase() === 'ensemble' && singleChannelEEG) {
-            metricsAlgorithm = 'SUV_NSRR2022_EEG';
+            metricsAlgorithm = 'SUV EEG';
         }else if (algorithm.toLowerCase() === 'ensemble' && singleChannelEOG) {
-            metricsAlgorithm = 'SUV_NSRR2022_EOG';
+            metricsAlgorithm = 'SUV EOG';
         }else if (algorithm.toLowerCase() === 'ensemble') {
-            metricsAlgorithm = 'SUV_NSRR2022';
+            metricsAlgorithm = 'SUV EEG/EOG';
         }else{
-            metricsAlgorithm = 'USLEEP_NSRR2022';
+            metricsAlgorithm = 'u-sleep EEG/EOG';
         }
         const data = await getMetricsFromCsv(metricsAlgorithm);
 
         overallMetricsDiv.innerHTML = `
             <p class="h3 text-body">References</p>
-            <p class="text-body">${parseFloat(data.means["Global Macro F1"].toFixed(2))} ± ${parseFloat(data.stds["Global Macro F1"].toFixed(2))}</p>
-            <p class="text-body">${parseFloat(data.means["F1-W"].toFixed(2))} ± ${parseFloat(data.stds["F1-W"].toFixed(2))}</p>
-            <p class="text-body">${parseFloat(data.means["F1-N1"].toFixed(2))} ± ${parseFloat(data.stds["F1-N1"].toFixed(2))}</p>
-            <p class="text-body">${parseFloat(data.means["F1-N2"].toFixed(2))} ± ${parseFloat(data.stds["F1-N2"].toFixed(2))}</p>
-            <p class="text-body">${parseFloat(data.means["F1-N3"].toFixed(2))} ± ${parseFloat(data.stds["F1-N3"].toFixed(2))}</p>
-            <p class="text-body">${parseFloat(data.means["F1-REM"].toFixed(2))} ± ${parseFloat(data.stds["F1-REM"].toFixed(2))}</p>
-            <p class="text-body">${parseFloat(data.means["Global Accuracy"].toFixed(2))} ± ${parseFloat(data.stds["Global Accuracy"].toFixed(2))}</p>
-            <p class="text-body">${parseFloat(data.means["Global Macro Recall"].toFixed(2))} ± ${parseFloat(data.stds["Global Macro Recall"].toFixed(2))}</p>
-            <p class="text-body">${parseFloat(data.means["Global Macro Precision"].toFixed(2))} ± ${parseFloat(data.stds["Global Macro Precision"].toFixed(2))}</p>
+            <p class="text-body">${data.values["Macro F1"]}</p>
+            <p class="text-body">${data.values["Wake F1"]}</p>
+            <p class="text-body">${data.values["N1 F1"]}</p>
+            <p class="text-body">${data.values["N2 F1"]}</p>
+            <p class="text-body">${data.values["N3 F1"]}</p>
+            <p class="text-body">${data.values["REM F1"]}</p>
+            <p class="text-body">${data.values["Accuracy"]}</p>
+            <p class="text-body">${data.values["Macro Recall"]}</p>
+            <p class="text-body">${data.values["Macro Precision"]}</p>
         `;
 
         insidePredictionMetricsColumn.appendChild(metricsDiv);
