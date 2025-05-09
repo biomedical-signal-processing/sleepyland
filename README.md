@@ -24,7 +24,7 @@ To get started, choose your operating system below. Just follow the step-by-step
 |                                                                   **Linux**                                                                    |                                                                   **Mac**                                                                    |                                                                   **Windows**                                                                    |
 |:----------------------------------------------------------------------------------------------------------------------------------------------:|:--------------------------------------------------------------------------------------------------------------------------------------------:|:------------------------------------------------------------------------------------------------------------------------------------------------:|
 | <img src="https://raw.githubusercontent.com/EgoistDeveloper/operating-system-logos/master/src/64x64/LIN.png" alt="Linux" style="width: 40px;"> | <img src="https://raw.githubusercontent.com/EgoistDeveloper/operating-system-logos/master/src/64x64/MAC.png" alt="Mac" style="width: 40px;"> | <img src="https://raw.githubusercontent.com/EgoistDeveloper/operating-system-logos/master/src/64x64/WIN.png" alt="Windows" style="width: 40px;"> |
-|                                           **Step 1**: [Download](./linux_setup.sh) `linux_setup.sh`                                            |                                          **Step 1**: [Download](./macos_setup.sh) `macos_setup.sh`                                           |                                             **Step 1**: [Download](./win_setup.ps1) `win_setup.ps1`                                              |
+|                              **Step 1**: [Download](./linux_setup.sh) `linux_setup.sh` or `linux_rocky_setup.sh`                               |                                          **Step 1**: [Download](./macos_setup.sh) `macos_setup.sh`                                           |                                             **Step 1**: [Download](./win_setup.ps1) `win_setup.ps1`                                              |
 |                                       **Step 2**: [Download `docker-compose.yml`](./docker-compose.yml)                                        |                                      **Step 2**: [Download `docker-compose.yml`](./docker-compose.yml)                                       |                                        **Step 2**: [Download `docker-compose.yml`](./docker-compose.yml)                                         |
 |                                          **Step 3**: Place the `.sh`/`.yml` files in the same folder.                                          |                                         **Step 3**: Place the `.sh`/`.yml` files in the same folder.                                         |                                          **Step 3**: Place the `.ps1`/`.yml` files in the same folder.                                           |
 |                                         **Step 4**: Open a terminal, navigate to the folder, and run:                                          |                                        **Step 4**: Open a terminal, navigate to the folder, and run:                                         |                                  **Step 4**: Open PowerShell as Administrator, navigate to the folder, and run:                                  |
@@ -35,19 +35,6 @@ To get started, choose your operating system below. Just follow the step-by-step
 > ❗GOOD TO KNOW❗
 > 
 > Running `.sh` and `.ps1` scripts will also update SLEEPYLAND, automatically pulling the latest version of the shared Docker images.
-    
->❗WARNING❗
-> 
->**Windows Users:**
-> SLEEPYLAND runs via Docker. Before running the script, ensure Docker Desktop is installed on your system. You can easily download it from [Docker's official website](https://www.docker.com/products/docker-desktop/).
->
-> > *In the future, this step will be handled automatically.*
-> 
-> Once downloaded, check if Docker is installed and running by opening a terminal and typing:
-> ```powershell
-> docker --version
-> ```
-> If the command returns the Docker version, you are ready to proceed from the step 1.
 
 > **Windows Users:**
 >
@@ -88,7 +75,7 @@ To get started, choose your operating system below. Just follow the step-by-step
 
 >❗WARNING❗
 > 
-> If you are running the **SLEEPYLAND** software, please be aware that the application attempts to pull/install external software dependencies during its setup process. 
+> Please be aware that SLEEPYLAND attempts to pull/install external software dependencies during its setup process. 
 > 
 > **Important Notice:**
 > If you are operating on an institutional machine (e.g., hospital or university systems), this process is likely to fail due to permission restrictions. To avoid this issue, ensure you have the necessary administrative permissions or consult your IT department before proceeding with the installation.
@@ -153,39 +140,43 @@ All models have been implemented to ensure consistency and fairness in their eva
   | Dataset      | Subject Count | PSG Count | Age (µ ± σ)   | Sex %M | BMI (µ ± σ)   | Sleep Disorders | Annotation Format | **Included** |
   |--------------|---------------|-----------|----------------|--------|----------------|------------------|-------------------|--------------|
   | [ABC](https://sleepdata.org/datasets/abc) | 49            | 132       | 48.8 ± 9.9     | 57.1   | 38.9 ± 3.0     | OSA              | .xml              | ✅            |
-  | [APOE](https://sleepdata.org/datasets/apoe) | 712           | 712       | 45.7 ± 13.6    | 59.1   | 27.2 ± 6.5     | SDB              | .STA              | ❌            |
-  | [APPLES](https://sleepdata.org/datasets/apples) | 1094          | 1094      | 50.1 ± 12.9    | 63.2   | 32.1 ± 7.8     | OSA              | .annot            | ❌            |
+  | [APOE](https://sleepdata.org/datasets/apoe) | 712           | 712       | 45.7 ± 13.6    | 59.1   | 27.2 ± 6.5     | SDB              | .STA              | ✅            |
+  | [APPLES](https://sleepdata.org/datasets/apples) | 1094          | 1094      | 50.1 ± 12.9    | 63.2   | 32.1 ± 7.8     | OSA              | .annot            | ✅            |
   | [CCSHS](https://sleepdata.org/datasets/ccshs) | 515           | 515       | 17.7 ± 0.4     | 50.5   | 25.1 ± 5.9     | SRMD             | .xml              | ✅            |
   | [CFS](https://sleepdata.org/datasets/cfs) | 144           | 730       | 41.4 ± 19.3    | 44.8   | 32.4 ± 9.5     | OSA              | .xml              | ✅            |
   | [CHAT](https://sleepdata.org/datasets/chat) | 1232          | 1638      | 7.0 ± 1.4      | 48.3   | 19.0 ± 4.9     | OSA              | .xml              | ✅            |
   | [HOMEPAP](https://sleepdata.org/datasets/homepap) | 246           | 246       | 46.5 ± 11.9    | 60.3   | 37.2 ± 8.9     | OSA              | .xml              | ✅            |
   | [MESA](https://sleepdata.org/datasets/mesa) | 2056          | 2056      | 69.9 ± 9.2     | 46.4   | 28.7 ± 5.6     | SDB              | .xml              | ✅            |
-  | [MNC_CNC](https://sleepdata.org/datasets/mnc_cnc) | 78            | 78        | 28.5 ± 16.9    | 51.3   | 23.2 ± 11.5    | NT1, NT2, IH     | .xml              | ❌            |
-  | [MNC_DHC](https://sleepdata.org/datasets/mnc_dhc) | 83            | 83        | 33.4 ± 14.8    | 50.0   | 24.8 ± 4.9     | -                | .xml              | ❌            |
-  | [MNC_SSC](https://sleepdata.org/datasets/mnc_ssc) | 767           | 767       | 45.4 ± 13.8    | 59.4   | 23.9 ± 6.5     | -                | .xml              | ❌            |
+  | [MNC_CNC](https://sleepdata.org/datasets/mnc_cnc) | 78            | 78        | 28.5 ± 16.9    | 51.3   | 23.2 ± 11.5    | NT1, NT2, IH     | .xml              | ✅            |
+  | [MNC_DHC](https://sleepdata.org/datasets/mnc_dhc) | 83            | 83        | 33.4 ± 14.8    | 50.0   | 24.8 ± 4.9     | -                | .xml              | ✅            |
+  | [MNC_SSC](https://sleepdata.org/datasets/mnc_ssc) | 767           | 767       | 45.4 ± 13.8    | 59.4   | 23.9 ± 6.5     | -                | .xml              | ✅            |
   | [MROS](https://sleepdata.org/datasets/mros) | 2905          | 3930      | 76.4 ± 5.5     | 100    | 27.2 ± 3.9     | SDB              | .xml              | ✅            |
-  | [MSP](https://sleepdata.org/datasets/msp) | 105           | 105       | 26.8 ± 5.9     | 0      | 42.4 ± 6.6     | SDB              | .annot            | ❌            |
-  | [NCHSDB](https://sleepdata.org/datasets/nchsdb) | 3651          | 3950      | 8.8 ± 5.9      | 56.3   | 22.7 ± 9.9     | -                | .tsv              | ❌            |
+  | [MSP](https://sleepdata.org/datasets/msp) | 105           | 105       | 26.8 ± 5.9     | 0      | 42.4 ± 6.6     | SDB              | .annot            | ✅            |
+  | [NCHSDB](https://sleepdata.org/datasets/nchsdb) | 3651          | 3950      | 8.8 ± 5.9      | 56.3   | 22.7 ± 9.9     | -                | .tsv              | ✅            |
   | [SHHS](https://sleepdata.org/datasets/shhs) | 5797          | 8444      | 63.1 ± 11.2    | 47.6   | 28.2 ± 5.1     | OSA, SDB         | .xml              | ✅            |
-  | [SOF](https://sleepdata.org/datasets/sof) | 453           | 453       | 82.9 ± 3.2     | 0      | 27.7 ± 4.6     | SDB              | .xml              | ❌            |
-  | [WSC](https://sleepdata.org/datasets/wsc) | 1123          | 2569      | 56.4 ± 8.1     | 54.1   | 31.7 ± 7.1     | SDB              | .txt              | ❌            |
+  | [SOF](https://sleepdata.org/datasets/sof) | 453           | 453       | 82.9 ± 3.2     | 0      | 27.7 ± 4.6     | SDB              | .xml              | ✅            |
+  | [WSC](https://sleepdata.org/datasets/wsc) | 1123          | 2569      | 56.4 ± 8.1     | 54.1   | 31.7 ± 7.1     | SDB              | .txt              | ✅            |
 
   
   <strong>Open Access Datasets Included for Model Testing</strong>
   <br />
 
-  | Dataset      | Subject Count | PSG Count | Age (µ ± σ)   | Sex %M | BMI (µ ± σ)   | Sleep Disorders | Annotation Format | **Included** |
-  |--------------|---------------|-----------|----------------|--------|----------------|------------------|-------------------|--------------|
-  | [DCSM](https://sid.erda.dk/wsgi-bin/ls.py?share_id=fUH3xbOXv8) | 255           | 255       | -              | -      | -              | -                | .ids              | ❌            |
-  | [PHYS](https://physionet.org/content/challenge-2018/1.0.0/) | 994           | 994       | 55.2 ± 14.3    | 67     | -              | SDB              | .ids              | ❌            |
-  | [SEDF_SC](https://physionet.org/content/challenge-2018/1.0.0/) | 78            | 153       | 58.8 ± 22.0    | 47     | -              | -                | .edf              | ❌            |
-  | [SEDF_ST](https://physionet.org/content/challenge-2018/1.0.0/) | 22            | 44        | 40.2 ± 17.7    | 32     | -              | -                | .edf              | ❌            |
-  | [ISRUC](https://sleeptight.isr.uc.pt/?page_id=48) | 100           | 100       | 51.1 ± 13.7    | 35.2   | 25.0 ± 5.8     | -                | .xml              | ❌            |
+  | Dataset                                                        | Subject Count | PSG Count | Age (µ ± σ) | Sex %M | BMI (µ ± σ)   | Sleep Disorders | Annotation Format | **Included** |
+  |----------------------------------------------------------------|---------------|-----------|-------------|--------|----------------|------------------|-------------------|-----------|
+  | [DCSM](https://sid.erda.dk/wsgi-bin/ls.py?share_id=fUH3xbOXv8) | 255           | 255       | -           | -      | -              | -                | .ids              | 🗸         |
+  | [DOD-H](https://github.com/Dreem-Organization/dreem-learning-open)              | 25            | 25        | -           | -      | -              | -                | .h5               | 🗸         |
+  | [DOD-O](https://github.com/Dreem-Organization/dreem-learning-open)              | 55            | 55        | -           | -      | -              | -                | .h5               | 🗸         |
+  | [PHYS](https://physionet.org/content/challenge-2018/1.0.0/)    | 994           | 994       | 55.2 ± 14.3 | 67     | -              | SDB              | .ids              | 🗸          |
+  | [SEDF_SC](https://physionet.org/content/challenge-2018/1.0.0/) | 78            | 153       | 58.8 ± 22.0 | 47     | -              | -                | .edf              | 🗸          |
+  | [SEDF_ST](https://physionet.org/content/challenge-2018/1.0.0/) | 22            | 44        | 40.2 ± 17.7 | 32     | -              | -                | .edf              | 🗸          |
+  | [ISRUC](https://sleeptight.isr.uc.pt/?page_id=48)              | 100           | 100       | 51.1 ± 13.7 | 35.2   | 25.0 ± 5.8     | -                | .xml              | ❌         |
 
 
 </div>
 
-**Note:** All deep learning-based models for sleep staging have been trained, validated, and tested on the datasets marked with a ✅.
+**Note:** All the deep learning-based models for sleep staging have been trained, validated, and tested on in-domain (ID) training datasets - datasets included marked with a ✅. 
+We assess the generalizability of the multiple models on the largest out-of-domain set of data - datasets included marked with a 🗸.
+
 </details>
 
 <details>
@@ -220,7 +211,7 @@ Follow these steps to kickstart your sleep staging data analysis journey on supp
 >
 > 🟢 **[MyEDF Data](#-myedf-data)**: Analyze/Predict your own recordings (user-provided `.edf` files) while ensuring complete data privacy and security.
 > 
-> 🔴 **Open Access Data**: Exploit commonly used open-access datasets to benchmark and compare different sleep staging models (_still not supported_). 
+> 🔴 **Open Access Data**: Exploit commonly used open-access datasets to benchmark and compare different sleep staging models (_still not supported in the GUI_). 
 
 ---
 
