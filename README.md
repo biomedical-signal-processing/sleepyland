@@ -191,14 +191,6 @@ We assess the generalizability of the multiple models on the largest out-of-doma
 
 </details>
 
-<details>
-  <summary><strong>Ensemble Metrics</strong></summary>
-  <div style="border: 1px solid #ccc; padding: 10px; border-radius: 5px; margin-top: 10px;">
-  </div>
-<br />
-
-</details>
-
 ---
 
 ## Getting Started with SLEEPYLAND
