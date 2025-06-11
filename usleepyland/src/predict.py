@@ -394,12 +394,16 @@ async def run_ensemble_one(folder_name: str, models: List[str]):
 
 
 async def create_annot_files(folder_output_name, model):
-
     folder_output_name = f"/app/output/{folder_output_name}/{model}"
 
     for root, dirs, files in os.walk(folder_output_name):
         for file in files:
             if file.endswith('.npy') and 'TRUE' not in file:
+                annot_file = file.replace('.npy', '.annot')
+
+                if annot_file in files:
+                    continue
+
                 folder_name = root.split('/')[-1]
 
                 if folder_name == 'majority':
@@ -409,9 +413,19 @@ async def create_annot_files(folder_output_name, model):
 
                 root += '/'
 
-                requests.post(WTF_NPY_TO_ANNOT_URL, data={'folder_path': root, 'channels': channels, 'model': model})
+                try:
+                    response = requests.post(WTF_NPY_TO_ANNOT_URL, data={
+                        'folder_path': root,
+                        'channels': channels,
+                        'model': model
+                    })
+                    response.raise_for_status()
+                except Exception as e:
+                    print(f"Error {file}: {e}")
 
-                shutil.rmtree(root + 'logs')
+                log_path = os.path.join(root, 'logs')
+                if os.path.exists(log_path):
+                    shutil.rmtree(log_path)
 
 @app.post("/evaluate")
 async def evaluate(folder_root_name: str = Form(...), folder_name: str = Form(...),
