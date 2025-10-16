@@ -39,6 +39,11 @@ COPY src ./wild-to-fancy/src
 WORKDIR wild-to-fancy
 
 # Create a conda environment based on the environment.yaml file
+# Accept Anaconda TOS for non-interactive Docker builds
+RUN conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/main && \
+    conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/r
+
+# Then create environment
 RUN conda env create -f environment.yaml
 
 # Activate the conda environment and install additional Python packages

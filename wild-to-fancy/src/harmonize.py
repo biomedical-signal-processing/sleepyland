@@ -116,14 +116,18 @@ async def harmonize(folder_name: str = Form(...), dataset: str = Form(...)):
 def npy_to_annot(folder_path: str = Form(...), channels: str = Form(...), model: str = Form(...)):
 
     npy_files = []
-
-    logger.debug(f"Processing files in: {folder_path}")
-
+            
     for file in os.listdir(folder_path):
-        logger.debug(f"Processing file: {file}")
-        if file.endswith('.npy'):
-            logger.debug(f"Found NPY file: {file}")
-            npy_files.append(file)
+        if not file.endswith('.npy'):
+            continue
+
+        annot_file = file.replace('.npy', '.annot')
+        annot_path = os.path.join(folder_path, annot_file)
+
+        if os.path.exists(annot_path):
+            continue
+
+        npy_files.append(file)
 
     if not npy_files:
         raise HTTPException(status_code=400, detail="No NPY file found.")
