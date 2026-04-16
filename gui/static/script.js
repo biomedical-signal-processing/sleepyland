@@ -557,6 +557,11 @@ async function sendRequest() {
     const form = document.getElementById('uploadForm');
     const formData = new FormData(form);
 
+    const progressContainers = document.querySelectorAll('.progress-container');
+    const progressBars = document.querySelectorAll('.progress-bar');
+    const statusLabels = document.querySelectorAll('.status-label');
+    const statusPercents = document.querySelectorAll('.status-percent');
+
     const checkboxes = document.querySelectorAll('#algorithms-select input[type="checkbox"]:checked');
     const validationBadgeAlgorithms = document.getElementById("validationBadgeAlgorithms");
     const validationBadgeChannels = document.getElementById("validationBadgeChannels");
@@ -591,11 +596,6 @@ async function sendRequest() {
         document.getElementById('nextPrevButtonDivHypno').style.setProperty('display', 'none', 'important');
         document.getElementById('nextPrevButtonDivPerformance').style.setProperty('display', 'none', 'important');
 
-        // Set status to processing, open sleep-stages tab, and scroll to top
-        status.textContent = 'Processing...';
-        statusHypno.textContent = 'Processing...';
-        statusPerformance.textContent = 'Processing...';
-
         //clear the cards
         document.getElementById('card-container').innerHTML = '';
         document.getElementById('card-container-hypno').innerHTML = '';
@@ -604,11 +604,38 @@ async function sendRequest() {
         new bootstrap.Tab(document.getElementById('sleep-stages-tab')).show();
         window.scrollTo(0, 0);
 
+        const folderName = formData.get('folderName'); // Assicurati che folderName sia nel formData
+
+        progressContainers.forEach(el => el.style.display = 'block');
+        progressBars.forEach(el => {
+            el.style.width = '0%';
+            el.classList.add('progress-bar-animated');
+            el.classList.replace('bg-success', 'bg-primary');
+        });
+
+        const pollingInterval = setInterval(async () => {
+            try {
+                const res = await fetch(`/progress/${folderName}`);
+                const progressData = await res.json();
+
+                if (progressData.percent !== undefined) {
+                    const percent = progressData.percent;
+                    const message = progressData.message || 'Processing...';
+
+                    // Aggiorniamo TUTTE le istanze della barra contemporaneamente
+                    progressBars.forEach(bar => bar.style.width = percent + '%');
+                    statusPercents.forEach(p => p.textContent = percent + '%');
+                    statusLabels.forEach(l => l.textContent = message);
+                }
+            } catch (e) { console.error("Errore polling:", e); }
+        }, 1000);
+
         try {
             // Send formData via POST request
             const response = await fetch('/process', {method: 'POST', body: formData});
             const data = await response.json();
-
+            clearInterval(pollingInterval);
+            progressContainers.forEach(el => el.style.display = 'none');
             let singleChannelEEG = false;
             let singleChannelEOG = false;
 
@@ -629,9 +656,11 @@ async function sendRequest() {
             status.textContent = 'An error occurred: ' + error;
             statusHypno.textContent = 'An error occurred: ' + error;
             statusPerformance.textContent = 'An error occurred: ' + error;
+            clearInterval(pollingInterval);
         } finally {
             // Re-enable submit button
             button.disabled = false;
+            clearInterval(pollingInterval);
         }
     }
 }
@@ -1311,38 +1340,74 @@ document.getElementById('predictButton').addEventListener('click', async () => {
     validationBadgeEdf.classList.toggle("d-none", isAnyFileSelected);
     validationBadgeFolderName.classList.toggle("d-none", isFolderNameValid);
 
+    const progressContainers = Array.from(document.querySelectorAll('.progress-container'))
+        .filter(el => !el.closest('#performance-content'));
+
+    const progressBars = Array.from(document.querySelectorAll('.progress-bar'))
+        .filter(el => !el.closest('#performance-content'));
+
+    const statusLabels = Array.from(document.querySelectorAll('.status-label'))
+        .filter(el => !el.closest('#performance-content'));
+
+    const statusPercents = Array.from(document.querySelectorAll('.status-percent'))
+        .filter(el => !el.closest('#performance-content'));
+
+    progressContainers.forEach(el => el.style.display = 'block');
+
+    progressBars.forEach(el => {
+        el.style.width = '0%';
+        el.classList.add('progress-bar-animated');
+        el.classList.replace('bg-success', 'bg-primary');
+    });
+
     if (isAnyChannelSelected && isAnyAlgorithmChecked && isAnyFileSelected && isFolderNameValid) {
 
-        // Append selected channels for each type to formData
         formData.append('channels', getCheckedChannels())
 
-        // Collect all checked algorithms
         const checkedAlgorithms = [...document.querySelectorAll('#algorithms-select input[type="checkbox"]:checked')]
             .map(checkbox => checkbox.id);
 
         formData.append('models', checkedAlgorithms.join(','));
 
-        // Disable submit button and hide navigation buttons during processing
         button.disabled = true;
         document.getElementById('nextPrevButtonDiv').style.setProperty('display', 'none', 'important');
         document.getElementById('nextPrevButtonDivHypno').style.setProperty('display', 'none', 'important');
         document.getElementById('nextPrevButtonDivPerformance').style.setProperty('display', 'none', 'important');
-        //clear the cards
         document.getElementById('card-container').innerHTML = '';
         document.getElementById('card-container-hypno').innerHTML = '';
         document.getElementById('card-container-performance').innerHTML = '';
 
-        // Set status to processing, open sleep-stages tab, and scroll to top
-        status.textContent = 'Processing...';
-        statusHypno.textContent = 'Processing...';
         statusPerformance.textContent = 'No data to display';
         new bootstrap.Tab(document.getElementById('sleep-stages-tab')).show();
         window.scrollTo(0, 0);
 
+        status.textContent = '';
+
+        const pollingInterval = setInterval(async () => {
+            try {
+                const res = await fetch(`/progress/${folderName}`);
+                const data = await res.json();
+
+                if (data.percent !== undefined) {
+                    const percent = data.percent;
+                    const message = data.message || 'Processing...';
+
+                    progressBars.forEach(bar => bar.style.width = percent + '%');
+                    statusPercents.forEach(p => p.textContent = percent + '%');
+                    statusLabels.forEach(l => l.textContent = message);
+                }
+            } catch (e) {
+                console.error("Polling error:", e);
+            }
+        }, 1000);
+
         try {
-            // Send formData via POST request
+
             const response = await fetch('/process_one', {method: 'POST', body: formData});
             const data = await response.json();
+
+            clearInterval(pollingInterval);
+            progressContainers.forEach(el => el.style.display = 'none');
 
             // Handle server response
             handleProcessingResponsePredictOne(response, data, checkedAlgorithms);

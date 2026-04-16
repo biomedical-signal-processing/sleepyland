@@ -11,6 +11,7 @@ from flask import jsonify
 import pandas as pd
 import os
 import shutil
+import json
 
 log = configure_logging()
 
@@ -102,6 +103,17 @@ async def quit_system():
         return {"message": "Server stopped successfully"}
     except Exception as e:
         return {"error": f"An error occurred: {e}"}
+
+@bp.route('/progress/<folder_name>')
+def get_progress(folder_name):
+    # Il percorso deve puntare al volume condiviso tra i container
+    status_path = f"/app/output/{folder_name}/status.json"
+
+    if os.path.exists(status_path):
+        with open(status_path, 'r') as f:
+            return jsonify(json.load(f))
+
+    return jsonify({"percent": 0, "message": "Starting process..."})
 
 @bp.route('/process', methods=['POST'])
 async def process():

@@ -558,22 +558,40 @@
 
                 <div class="tab-pane fade" id="sleep-stages-content" role="tabpanel" aria-labelledby="sleep-stages-tab">
                     <div id="resultsContent">
+                        <div class="progress-container my-4" style="display: none;">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="status-label text-muted small"></span>
+                                <span class="status-percent text-primary small fw-bold">0%</span>
+                            </div>
+                            <div class="progress" style="height: 20px;">
+                                <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary" role="progressbar" style="width: 0%;"></div>
+                            </div>
+                        </div>
                         <p id="status">No data to display</p>
+
                         <div id="results">
                             <div id="card-container"></div>
-                            <div id="nextPrevButtonDiv" class="d-flex justify-content-between my-3"
-                                 style="display: none !important">
+                            <div id="nextPrevButtonDiv" class="d-flex justify-content-between my-3" style="display: none !important">
                                 <button class="btn btn-secondary" id="prev">Previous</button>
                                 <button class="btn btn-secondary" id="next">Next</button>
                             </div>
-
                         </div>
                     </div>
                 </div>
 
                 <div class="tab-pane fade" id="hypnodensity-content" role="tabpanel" aria-labelledby="hypnodensity-tab">
                     <div id="resultsContentHypnodensity">
-                        <p id="statusHypno">No data to display</p>
+                        <div class="progress-container my-4" style="display: none;">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="status-label text-muted small"></span>
+                                <span class="status-percent text-primary small fw-bold">0%</span>
+                            </div>
+                            <div class="progress" style="height: 20px;">
+                                <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary" role="progressbar" style="width: 0%;"></div>
+                            </div>
+                        </div>
+                        <p id="statusHypno"></p>
+                    </div>
                         <div id="resultsHypno">
                             <div id="card-container-hypno"></div>
                             <div id="nextPrevButtonDivHypno" class="d-flex justify-content-between my-3"
@@ -588,7 +606,17 @@
 
                 <div class="tab-pane fade" id="performance-content" role="tabpanel" aria-labelledby="performance-tab">
                     <div id="resultsContentPerformance">
+                        <div class="progress-container my-4" style="display: none;">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="status-label text-muted small"></span>
+                                <span class="status-percent text-primary small fw-bold">0%</span>
+                            </div>
+                            <div class="progress" style="height: 20px;">
+                                <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary" role="progressbar" style="width: 0%;"></div>
+                            </div>
+                        </div>
                         <p id="statusPerformance">No data to display</p>
+                    </div>
                         <div id="resultsPerformance">
                             <div id="card-container-performance"></div>
                             <div id="testPerformances"></div>

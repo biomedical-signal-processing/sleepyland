@@ -3,6 +3,7 @@ import os
 import tempfile
 import shutil
 import numpy as np
+import json
 
 import logging
 
@@ -15,6 +16,15 @@ PREDICT_ONE_URL = "http://usleepyland:7777/predict_one"
 ENSEMBLE_URL = "http://usleepyland:7777/ensemble"
 ENSEMBLE_ONE_URL = "http://usleepyland:7777/ensemble_one"
 
+def update_job_status(folder_name, percent, message):
+    try:
+        status_path = f"/app/output/{folder_name}/status.json"
+        os.makedirs(os.path.dirname(status_path), exist_ok=True)
+        with open(status_path, 'w') as f:
+            json.dump({"percent": percent, "message": message}, f)
+    except Exception as e:
+        logger.error(f"Could not update status file: {e}")
+
 def harmonize_service(dataset_name: str):
     harmonize_data = False
 
@@ -25,13 +35,11 @@ def harmonize_service(dataset_name: str):
 
     folders_to_process = []
 
-    # Walk through the directory to find folders containing .edf files
     for root, dirs, files in os.walk(input_folder):
         edf_files = [f for f in files if f.endswith('.edf') or f.endswith('.EDF')]
         if edf_files:
             folders_to_process.append(root)
 
-    # Process each folder that contains .edf files
     for folder_path in folders_to_process:
         folder_name = os.path.basename(folder_path)
 
@@ -46,20 +54,22 @@ def harmonize_service(dataset_name: str):
     print("Harmonization finished")
     return harmonize_data
 
-
 def predict_service(folder_root_name, folder_name, eeg_channels, eog_channels, emg_channels, dataset, models, resolution):
+    update_job_status(folder_name, 0, "Initializing process...")
+
     responses = []
     response = None
     ensemble_checked = False
 
-
-    #if model_generated containes 'ensemble' then remove it
     if 'ensemble' in models:
         if resolution == "30" or resolution is None:
             models.remove('ensemble')
             ensemble_checked = True
         else:
             models.remove('ensemble')
+
+    total_steps = len(models) + (1 if ensemble_checked else 0)
+    current_step = 0
 
     if resolution is not None:
         try:
@@ -71,6 +81,10 @@ def predict_service(folder_root_name, folder_name, eeg_channels, eog_channels, e
             print("Error: Resolution number is not valid")
 
     for model in models:
+        current_step += 1
+        percent = int(((current_step - 1) / total_steps) * 100)
+
+        update_job_status(folder_name, percent, f"Running model: {model} ({current_step}/{total_steps})")
 
         response = requests.post(EVALUATION_URL,
                                  data={'folder_root_name': folder_root_name, 'folder_name': folder_name,
@@ -92,13 +106,14 @@ def predict_service(folder_root_name, folder_name, eeg_channels, eog_channels, e
 
         if response.status_code == 200:
             try:
-                # Parse the JSON response
                 response_json = response.json()
 
-                # Append the model name and its metrics to the responses list
                 responses.append({
                     f"{model}": response_json.get(f"${model}", {})
                 })
+
+                intermediate_percent = int((current_step / total_steps) * 100)
+                update_job_status(folder_name, intermediate_percent, f"Model {model} finished.")
 
             except Exception as e:
                 logger.error(f"Error parsing response for model {model}: {e}")
@@ -106,15 +121,18 @@ def predict_service(folder_root_name, folder_name, eeg_channels, eog_channels, e
             logger.error(f"Failed to get response for model {model}. Status code: {response.status_code}")
 
     if ensemble_checked:
+
+        current_step += 1
+        percent = int(((current_step - 1) / total_steps) * 100)
+        update_job_status(folder_name, percent, "Calculating Ensemble...")
+
         response = requests.post(ENSEMBLE_URL,
                                  data={'folder_name': folder_name, 'models': models})
 
         if response.status_code == 200:
             try:
-                # Parse the JSON response
                 response_json = response.json()
 
-                # Append the model name and its metrics to the responses list
                 responses.append({
                     "ensemble": response_json.get("ensemble", {})
                 })
@@ -128,19 +146,17 @@ def predict_service(folder_root_name, folder_name, eeg_channels, eog_channels, e
         "message": "Prediction failed", "metrics": []}
 
 def predict_one_service(folder_root_name, folder_name, channels, models, log, resolution):
+    update_job_status(folder_name, 0, "Initializing process...")
+
     responses = []
     response = None
     ensemble_checked = False
     edf_folder = '/app/input/myedf'
 
-    # Get all .edf files in the folder
     edf_files = [f for f in os.listdir(edf_folder) if f.endswith('.edf')]
-
     if not edf_files:
         log.error("No EDF files found in /app/input/myedf")
         return {"error": "No EDF files found"}
-
-    # Check if ensemble is selected
 
     if 'ensemble' in models:
         if resolution == "30" or resolution is None:
@@ -149,19 +165,29 @@ def predict_one_service(folder_root_name, folder_name, channels, models, log, re
         else:
             models.remove('ensemble')
 
+    num_files = len(edf_files)
+    num_models = len(models)
+    total_steps = (num_files * num_models) + (1 if ensemble_checked else 0)
+    current_step = 0
+
     if resolution is not None:
         try:
-            resolution = int(resolution)
-            if 30 % resolution == 0:
-                result = resolution * 128
-                resolution = str(result)
+            res_val = int(resolution)
+            if 30 % res_val == 0:
+                resolution = str(res_val * 128)
         except ValueError:
-            print("Error: Resolution number is not valid")
+            log.error("Error: Resolution number is not valid")
 
-    # Process each EDF file
-    for edf_file in edf_files:
+    for f_idx, edf_file in enumerate(edf_files):
 
-        for model in models:
+        for m_idx, model in enumerate(models):
+            current_step += 1
+
+            percent = int(((current_step - 1) / total_steps) * 100)
+
+            status_msg = f"File {f_idx + 1}/{num_files} - Model: {model}"
+            update_job_status(folder_name, percent, status_msg)
+
             response = requests.post(PREDICT_ONE_URL, data={
                 'folder_root_name': edf_folder,
                 'folder_name': folder_name,
@@ -170,16 +196,18 @@ def predict_one_service(folder_root_name, folder_name, channels, models, log, re
                 'file_name': edf_file,
                 'resolution': resolution
             })
-            if response.status_code == 200:
-                try:
-                    logger.debug(f"Response for model {model}")
-                except Exception as e:
-                    logger.error(f"Error parsing response for model {model}: {e}")
-            else:
-                logger.error(f"Failed to get response for model {model}. Status code: {response.status_code}")
+
+            if response.status_code != 200:
+                log.error(f"Failed for {edf_file} with {model}. Status: {response.status_code}")
 
     if ensemble_checked:
-        requests.post(ENSEMBLE_ONE_URL,
-                                 data={'folder_name': folder_name, 'models': models})
+        current_step += 1
+        percent = int(((current_step - 1) / total_steps) * 100)
+        update_job_status(folder_name, percent, "Calculating final ensemble...")
 
+        requests.post(ENSEMBLE_ONE_URL, data={'folder_name': folder_name, 'models': models})
+
+    # Fine processo
+    update_job_status(folder_name, 100, "Processing complete for all files.")
     return {"message": "Prediction completed successfully."}
+
