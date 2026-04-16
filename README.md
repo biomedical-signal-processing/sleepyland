@@ -15,6 +15,15 @@
 
 ---
 
+If you use **SLEEPYLAND** in your research or applications, please cite the following paper:
+
+Rossi AD, Metaldi M, Bechny M, Filchenko I, Meer JV, Schmidt MH, Bassetti CLA, Tzovara A, Faraci FD, Fiorillo L.  
+**SLEEPYLAND: trust begins with fair evaluation of automatic sleep staging models.**  
+npj Digital Medicine. 2025 Dec 16. doi:10.1038/s41746-025-02237-2.  
+Available at: https://www.nature.com/articles/s41746-025-02237-2
+
+---
+
 ## Download & Run SLEEPYLAND
 
 To get started, choose your operating system below. Just follow the step-by-step guideline. This is the recommended method as it allows you to visualize the installation process directly in the shell.
@@ -71,7 +80,6 @@ To get started, choose your operating system below. Just follow the step-by-step
 > ```bash
 > docker compose -f docker-compose.yml -p sleepyland stop
 > ```
-> *In the future, we will add a feature to close the app directly from the web UI.*
 
 >❗WARNING❗
 > 
@@ -89,7 +97,7 @@ To get started, choose your operating system below. Just follow the step-by-step
 |:--------------------------------------------------------------------------------------------------------------------:|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
 | All analyses run **locally on your device**, ensuring complete data **privacy**. Your data never leaves your laptop. | The included deep learning sleep staging models have been **fairly trained** and validated on consistent public datasets, ensuring **robust and reliable performance** for accurate sleep analysis and stage classification. |
 
-> All the exposed sleep staging models run locally on your CPU (GPU support is not yet available). As a result, some models, such as the `deepresnet` and `sleeptransformer`model, may perform slowly when predicting or evaluating multiple combinations of EEG and EOG channels. We are actively working on optimizations and will release enhanced versions soon.
+> All the exposed sleep staging models run locally on your CPU (GPU support is not available). As a result, some models, such as the `deepresnet` and `sleeptransformer`model, may perform slowly when predicting or evaluating multiple combinations of EEG and EOG channels.
 
 </div>
 
@@ -101,25 +109,16 @@ For instructions on navigating the UI and making the most of the analysis tools,
 
 ## List of Models for Sleep Staging
 
-### Feature-Based Models for Sleep Staging
-
 | **Model**        | **Description**                                                                                               | **Developed By**     | **References**                                             | **Available** |
 |------------------|---------------------------------------------------------------------------------------------------------------|----------------------|-----------------------------------------------------------|---------------|
-| **POPS (Luna)**   | A feature-based model for sleep stage classification using manually engineered features from PSG data.        | Luna Sleep Toolbox    | [Luna Resource](https://zzz.bwh.harvard.edu/luna/)      | ❌           |
 | **YASA**          | A lightweight, open-source package for sleep staging, offering rapid sleep analysis using EEG/EOG/EMG signals. | Raphael Vallat, et al | Vallat R, Walker MP. [An open-source, high-performance tool for automated sleep staging.](https://doi.org/10.7554/eLife.70092) Elife. 2021. | ✅           |
-
-**Note:** Feature-based models are used only for predictions and have not been retrained from scratch on datasets within the SLEEPYLAND context.
-
-### Deep Learning Models for Sleep Staging
-
-| **Model**       | **Description**                                                                                                               | **Developed By**                 | **References**                                                                                                                                                                                                              | **Available** |
-|-----------------|-------------------------------------------------------------------------------------------------------------------------------|----------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------|
 | **U-Sleep**     | A robust deep learning model designed to handle various PSG setups and mixed-cohort datasets for automated sleep staging.      | Perslev, et al                   | Perslev M, Darkner S, et al. [U-Sleep: resilient high-frequency sleep staging.](https://doi.org/10.1038/s41746-021-00440-5) NPJ Digital Medicine. 2021.                                                                     | ✅          |
 | **DeepResNet**  | A deep residual network model for high-frequency sleep stage classification using PSG data.                                    | Olesen, et al                    | Olesen AN, Jennum PJ, et al. [Automatic sleep stage classification with deep residual networks in a mixed-cohort setting.](https://doi.org/10.1093/sleep/zsaa161) Sleep. 2021.                                              | ✅          |
 | **SleepTransformer** | A transformer-based model that provides sleep staging with interpretability and uncertainty quantification.                    | Phan, et al                      | Phan H, Mikkelsen K, et al. [Sleeptransformer: Automatic sleep staging with interpretability and uncertainty quantification.](https://doi.org/10.1109/TBME.2022.3147187) IEEE Transactions on Biomedical Engineering. 2022. | ✅          |
-| **L-SeqSleepNet** | L-SeqSleepNet: Whole-cycle Long Sequence Modeling for Automatic Sleep Staging.                    | Phan, et al                      | Phan H, Lorenzen KP, et al. [L-SeqSleepNet: Whole-cycle Long Sequence Modeling for Automatic Sleep Staging.](https://doi.org/10.1109/JBHI.2023.3303197) IEEE Journal of Biomedical and Health Informatics. 2023.            | ❌          |
 
-All models have been implemented to ensure consistency and fairness in their evaluation on the NSRR datasets. Additionally, all models are now available in a single-channel configuration (EEG or EOG) and in the multi-channel configuration (EEG+EOG), offering flexibility to match user data and requirements.
+The **YASA** model has not been retrained from scratch on NSRR datasets within the SLEEPYLAND. 
+All the other models have been implemented to ensure consistency and fairness in their evaluation on the NSRR datasets. 
+All the models are available in a single-channel configuration (e.g., EEG or EOG) and in the multi-channel configuration (e.g., EEG+EOG).
 
 ---
 
@@ -163,19 +162,17 @@ All models have been implemented to ensure consistency and fairness in their eva
 
   | Dataset                                                        | Subject Count | PSG Count | Age (µ ± σ) | Sex %M | BMI (µ ± σ)   | Sleep Disorders | Annotation Format | **Included** |
   |----------------------------------------------------------------|---------------|-----------|-------------|--------|----------------|------------------|-------------------|-----------|
-  | [DCSM](https://sid.erda.dk/wsgi-bin/ls.py?share_id=fUH3xbOXv8) | 255           | 255       | -           | -      | -              | -                | .ids              | 🗸         |
-  | [DOD-H](https://github.com/Dreem-Organization/dreem-learning-open)              | 25            | 25        | -           | -      | -              | -                | .h5               | 🗸         |
-  | [DOD-O](https://github.com/Dreem-Organization/dreem-learning-open)              | 55            | 55        | -           | -      | -              | -                | .h5               | 🗸         |
-  | [PHYS](https://physionet.org/content/challenge-2018/1.0.0/)    | 994           | 994       | 55.2 ± 14.3 | 67     | -              | SDB              | .ids              | 🗸          |
-  | [SEDF_SC](https://physionet.org/content/challenge-2018/1.0.0/) | 78            | 153       | 58.8 ± 22.0 | 47     | -              | -                | .edf              | 🗸          |
-  | [SEDF_ST](https://physionet.org/content/challenge-2018/1.0.0/) | 22            | 44        | 40.2 ± 17.7 | 32     | -              | -                | .edf              | 🗸          |
-  | [ISRUC](https://sleeptight.isr.uc.pt/?page_id=48)              | 100           | 100       | 51.1 ± 13.7 | 35.2   | 25.0 ± 5.8     | -                | .xml              | ❌         |
-
+  | [DCSM](https://sid.erda.dk/wsgi-bin/ls.py?share_id=fUH3xbOXv8) | 255           | 255       | -           | -      | -              | -                | .ids              | ✔️         |
+  | [DOD-H](https://github.com/Dreem-Organization/dreem-learning-open)              | 25            | 25        | -           | -      | -              | -                | .h5               | ✔️         |
+  | [DOD-O](https://github.com/Dreem-Organization/dreem-learning-open)              | 55            | 55        | -           | -      | -              | -                | .h5               | ✔️         |
+  | [PHYS](https://physionet.org/content/challenge-2018/1.0.0/)    | 994           | 994       | 55.2 ± 14.3 | 67     | -              | SDB              | .ids              | ✔️          |
+  | [SEDF_SC](https://physionet.org/content/challenge-2018/1.0.0/) | 78            | 153       | 58.8 ± 22.0 | 47     | -              | -                | .edf              | ✔️          |
+  | [SEDF_ST](https://physionet.org/content/challenge-2018/1.0.0/) | 22            | 44        | 40.2 ± 17.7 | 32     | -              | -                | .edf              | ✔️          |
 
 </div>
 
 **Note:** All the deep learning-based models for sleep staging have been trained, validated, and tested on in-domain (ID) training datasets - datasets included marked with a ✅. 
-We assess the generalizability of the multiple models on the largest out-of-domain set of data - datasets included marked with a 🗸.
+We assess the generalizability of the multiple models on the largest out-of-domain set of data - datasets included marked with a ✔️.
 
 </details>
 
@@ -202,8 +199,6 @@ Follow these steps to kickstart your sleep staging data analysis journey on supp
 > 🟢 **[NSRR Data](#-nsrr-data)**: Benchmark and compare different sleep staging models using NSRR recordings. This option allows you to evaluate the performance of various models on standardized datasets.
 >
 > 🟢 **[MyEDF Data](#-myedf-data)**: Analyze/Predict your own recordings (user-provided `.edf` files) while ensuring complete data privacy and security.
-> 
-> 🔴 **Open Access Data**: Exploit commonly used open-access datasets to benchmark and compare different sleep staging models (_still not supported in the GUI_). 
 
 ---
 
