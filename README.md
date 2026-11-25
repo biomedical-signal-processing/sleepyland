@@ -24,6 +24,18 @@ Available at: https://www.nature.com/articles/s41746-025-02237-2
 
 ---
 
+> [!IMPORTANT]
+> **[SLEEPYLAND-PLUS](https://github.com/biomedical-signal-processing/sleepyland-plus) is available.** It is a lighter version of SLEEPYLAND for staging **your own EDF recordings**.
+>
+> - **One-click launchers** for Windows, macOS and Linux ([Releases page](https://github.com/biomedical-signal-processing/sleepyland-plus/releases/latest)). Docker is checked and set up for you.
+> - **Preprocessing of your EDFs**: optional notch and bandpass filters, amplitude clipping, resampling and scaling.
+> - **USleep, DeepResNet and SleepTransformer** in a guided web interface, with per-channel and per-modality results and soft-voting ensembles.
+> - **Hypnograms and stage probabilities** to inspect, plus annotation export for review in **SOMNOmedics** or **Compumedics**.
+>
+> **If you want to simply stage your own sleep recordings, go to [SLEEPYLAND-PLUS](https://github.com/biomedical-signal-processing/sleepyland-plus).** This repository stays the reference toolbox for fair, reproducible evaluation of sleep-staging models on large NSRR datasets.
+
+---
+
 ## Download & Run SLEEPYLAND
 
 To get started, choose your operating system below. Just follow the step-by-step guideline. This is the recommended method as it allows you to visualize the installation process directly in the shell.
