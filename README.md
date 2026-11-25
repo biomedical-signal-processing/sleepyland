@@ -32,7 +32,7 @@ Available at: https://www.nature.com/articles/s41746-025-02237-2
 > - **USleep, DeepResNet and SleepTransformer** in a guided web interface, with per-channel and per-modality results and soft-voting ensembles.
 > - **Hypnograms and stage probabilities** to inspect, plus annotation export for review in **SOMNOmedics** or **Compumedics**.
 >
-> **If you want to simply stage your own sleep recordings, go to [SLEEPYLAND-PLUS](https://github.com/biomedical-signal-processing/sleepyland-plus).** This repository stays the reference toolbox for fair, reproducible evaluation of sleep-staging models on large NSRR datasets.
+> **If you want to simply stage your own sleep recordings, go to [SLEEPYLAND-PLUS](https://github.com/biomedical-signal-processing/sleepyland-plus).** This repository stays the reference toolbox for fair, reproducible evaluation of sleep-staging models on NSRR datasets.
 
 ---
 
